@@ -1,4 +1,11 @@
-import type { ApiErrorPayload, User } from '../types/auth';
+import type {
+  ApiErrorPayload,
+  Category,
+  CreateCategoryInput,
+  CreateTransactionInput,
+  Transaction,
+  User,
+} from '../types/auth';
 
 export class ApiError extends Error {
   public readonly status: number;
@@ -29,7 +36,10 @@ function unwrapData<T>(payload: unknown): T {
   return payload as T;
 }
 
-function extractErrorMessage(payload: ApiErrorPayload | null, fallback: string): { code: string; message: string } {
+function extractErrorMessage(
+  payload: ApiErrorPayload | null,
+  fallback: string
+): { code: string; message: string } {
   if (!payload || typeof payload !== 'object') {
     return { code: 'API_ERROR', message: fallback };
   }
@@ -67,15 +77,19 @@ export async function apiRequest<T>(
     credentials: 'include',
   });
 
+  if (!response) {
+    throw new ApiError(500, 'NETWORK_ERROR', 'No response received from server');
+  }
+
   let parsedBody: unknown = null;
-  const contentType = response.headers.get('content-type') || '';
+  const contentType = response.headers?.get('content-type') || '';
   if (contentType.includes('application/json')) {
     try {
       parsedBody = await response.json();
     } catch {
       parsedBody = null;
     }
-  } else {
+  } else if (typeof response.text === 'function') {
     const text = await response.text();
     if (text) {
       try {
@@ -91,7 +105,10 @@ export async function apiRequest<T>(
       response.status === 401
         ? 'Invalid email or password'
         : `Request failed with status ${response.status}`;
-    const { code, message } = extractErrorMessage(parsedBody as ApiErrorPayload | null, fallback);
+    const { code, message } = extractErrorMessage(
+      parsedBody as ApiErrorPayload | null,
+      fallback
+    );
     throw new ApiError(response.status, code, message);
   }
 
@@ -120,3 +137,34 @@ export const authApi = {
   },
 };
 
+export const categoriesApi = {
+  async list(): Promise<Category[]> {
+    const result = await apiRequest<Category[]>('/api/categories', {
+      method: 'GET',
+    });
+    return Array.isArray(result) ? result : [];
+  },
+
+  async create(input: CreateCategoryInput): Promise<Category> {
+    return apiRequest<Category>('/api/categories', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+};
+
+export const transactionsApi = {
+  async list(): Promise<Transaction[]> {
+    const result = await apiRequest<Transaction[]>('/api/transactions', {
+      method: 'GET',
+    });
+    return Array.isArray(result) ? result : [];
+  },
+
+  async create(input: CreateTransactionInput): Promise<Transaction> {
+    return apiRequest<Transaction>('/api/transactions', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    });
+  },
+};
