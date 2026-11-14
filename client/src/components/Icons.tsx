@@ -302,6 +302,42 @@ export const ChevronRightIcon: React.FC<IconProps> = ({ className = '', size = 1
   </svg>
 );
 
+export const MinimalIcon: React.FC<IconProps> = ({ className = '', size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`icon-svg ${className}`}
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <line x1="5.6" y1="5.6" x2="18.4" y2="18.4" />
+  </svg>
+);
+
+export const LeafIcon: React.FC<IconProps> = ({ className = '', size = 18 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`icon-svg ${className}`}
+    aria-hidden="true"
+  >
+    <path d="M11 20A7 7 0 0 1 4 13C4 7 11 2 20 2c0 9-5 16-11 16c-1.5 0-3-.5-4.2-1.4" />
+    <path d="M2 22s5.5-1.5 9-6" />
+  </svg>
+);
+
 /**
  * Dreamy 3D Pastel Wallet Illustration with embossed Sakura flower
  * Directly inspired by Reference Image 2 (Empty state dashboard)

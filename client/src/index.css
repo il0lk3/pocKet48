@@ -100,16 +100,38 @@ html, body {
     radial-gradient(circle at 50% 85%, rgba(134, 239, 176, 0.22) 0%, transparent 55%);
 }
 
-/* Top-Left Blooming Sakura Tree Canopy from User Reference Images */
+/* Blooming Sakura Tree & Foliage Canopies from User Reference Images */
 .sakura-tree-canopy-top-left {
   position: absolute;
   top: 0;
   left: 0;
-  width: 420px;
+  width: 520px;
+  max-width: 48vw;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 10px 22px rgba(251, 113, 152, 0.28));
+}
+
+.sakura-tree-canopy-top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 32vw;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 8px 18px rgba(251, 113, 152, 0.22));
+}
+
+.mint-tree-canopy-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 460px;
   max-width: 45vw;
   pointer-events: none;
   z-index: 2;
-  filter: drop-shadow(0 8px 18px rgba(251, 113, 152, 0.25));
+  filter: drop-shadow(0 8px 18px rgba(52, 211, 153, 0.22));
 }
 
 .canopy-svg {
@@ -207,6 +229,20 @@ html, body {
 .star-3 { top: 65%; left: 12%; animation-delay: 2.2s; }
 .star-4 { top: 80%; right: 28%; animation-delay: 0.8s; }
 .star-5 { top: 22%; left: 75%; animation-delay: 2.9s; }
+.star-6 { top: 38%; left: 32%; animation-delay: 1.8s; }
+.star-7 { top: 52%; right: 12%; animation-delay: 0.5s; }
+.star-8 { top: 72%; left: 60%; animation-delay: 3.1s; }
+.star-9 { top: 15%; right: 45%; animation-delay: 2.1s; }
+
+.stars-sparkle-extravagant .star-twinkle {
+  width: 8px;
+  height: 8px;
+  box-shadow: 0 0 14px 4px rgba(255, 255, 255, 1), 0 0 28px 8px rgba(203, 180, 252, 0.85);
+}
+
+.orb-subtle {
+  opacity: 0.22 !important;
+}
 
 @keyframes twinkleStar {
   0%, 100% { opacity: 0.25; transform: scale(0.6); }
@@ -234,6 +270,10 @@ html, body {
   animation: sakuraSway ease-in-out infinite alternate;
   transform-origin: center center;
   filter: drop-shadow(0 4px 8px rgba(244, 114, 182, 0.25));
+}
+
+.sakura-petal-leaf.petal-mint {
+  filter: drop-shadow(0 4px 8px rgba(110, 231, 183, 0.35));
 }
 
 @keyframes sakuraFall {
@@ -1601,6 +1641,199 @@ html, body {
   margin-bottom: 2rem;
 }
 
+/* ==========================================================================
+   Ambiance Switcher (Interactive Theme Effect Selector)
+   ========================================================================== */
+
+.ambiance-switcher-container {
+  position: relative;
+  display: inline-block;
+}
+
+.auth-ambiance-corner {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+}
+
+.ambiance-trigger-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--color-violet-200);
+  box-shadow: 0 4px 14px rgba(175, 140, 247, 0.12);
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  transition: all 0.2s ease;
+}
+
+.ambiance-trigger-pill:hover {
+  background: #ffffff;
+  border-color: var(--color-violet-400);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(175, 140, 247, 0.22);
+}
+
+.ambiance-trigger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ambiance-icon-sakura {
+  color: #fb7198;
+}
+
+.ambiance-icon-sparkle {
+  color: #a855f7;
+}
+
+.ambiance-icon-mint {
+  color: #10b981;
+}
+
+.ambiance-icon-none {
+  color: var(--color-text-muted);
+}
+
+.ambiance-trigger-label {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.ambiance-trigger-arrow {
+  font-size: 0.75rem;
+  color: var(--color-violet-500);
+  transition: transform 0.2s ease;
+}
+
+/* Popover Dropdown */
+.ambiance-popover-card {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 270px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 22px;
+  box-shadow: 
+    0 20px 45px -10px rgba(175, 140, 247, 0.35),
+    0 8px 22px rgba(251, 113, 152, 0.15);
+  padding: 0.95rem;
+  z-index: 250;
+  animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ambiance-popover-header {
+  padding: 0.2rem 0.5rem 0.65rem;
+  border-bottom: 1.5px dashed var(--color-violet-200);
+  margin-bottom: 0.6rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.popover-title-th {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+
+.popover-title-sub {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--color-violet-500);
+}
+
+.ambiance-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ambiance-option-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border-radius: 16px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-family);
+  text-align: left;
+  transition: all 0.18s ease;
+}
+
+.ambiance-option-item:hover {
+  background: rgba(243, 239, 255, 0.85);
+  border-color: var(--color-violet-200);
+  transform: translateX(2px);
+}
+
+.ambiance-option-item.option-selected {
+  background: linear-gradient(135deg, #f3efff 0%, #ffe4eb 100%);
+  border-color: var(--color-violet-300);
+}
+
+.opt-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgba(175, 140, 247, 0.16);
+  flex-shrink: 0;
+}
+
+.opt-text-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.opt-name-th {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+
+.opt-name-en {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.opt-check-mark {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--color-violet-600);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .header-inner {
@@ -1633,5 +1866,15 @@ html, body {
   }
   .sakura-tree-canopy-top-left {
     width: 260px;
+  }
+  .sakura-tree-canopy-top-right {
+    width: 160px;
+  }
+  .mint-tree-canopy-top-left {
+    width: 240px;
+  }
+  .auth-ambiance-corner {
+    top: 1rem;
+    right: 1rem;
   }
 }

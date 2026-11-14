@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../api/client';
 import { SakuraBackground } from '../components/SakuraBackground';
+import { AmbianceSwitcher } from '../components/AmbianceSwitcher';
 import { SakuraIcon, SparkleIcon, MailIcon, LockIcon } from '../components/Icons';
 
 export const LoginPage: React.FC = () => {
@@ -94,6 +95,10 @@ export const LoginPage: React.FC = () => {
     <div className="auth-container">
       {/* Dreamy Stage Ambiance & Sakura Tree Canopy */}
       <SakuraBackground />
+
+      <div className="auth-ambiance-corner">
+        <AmbianceSwitcher />
+      </div>
 
       <div className="auth-content-flow">
         {/* Top Branding Section matching Reference Image 1 */}

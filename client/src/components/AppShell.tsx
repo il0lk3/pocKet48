@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SakuraBackground } from './SakuraBackground';
+import { AmbianceSwitcher } from './AmbianceSwitcher';
 import {
   SakuraIcon,
   WalletIcon,
@@ -82,6 +83,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
           {user && (
             <div className="user-controls">
+              <AmbianceSwitcher />
               <div className="user-profile-badge">
                 <span className="user-avatar-dot">
                   <UserIcon size={13} />
