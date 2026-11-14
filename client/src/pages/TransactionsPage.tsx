@@ -3,6 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ApiError, categoriesApi, transactionsApi } from '../api/client';
 import { AppShell } from '../components/AppShell';
 import type { Category, Transaction, TransactionType } from '../types/auth';
+import { GrandCalendarPicker } from '../components/GrandCalendarPicker';
+import {
+  CalendarIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+  BalanceIcon,
+  PlusIcon,
+  SparkleIcon,
+  SakuraIcon,
+  CuteWalletIllustration,
+} from '../components/Icons';
 
 export function getBangkokTodayDateString(): string {
   return new Intl.DateTimeFormat('en-CA', {
@@ -121,6 +132,30 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
     });
   }, [transactions]);
 
+  // Compute Financial Summary for Pastel Stat Cards
+  const summary = useMemo(() => {
+    let incomeSatang = 0;
+    let expenseSatang = 0;
+    for (const tx of transactions) {
+      const satang =
+        typeof tx.amountSatang === 'number'
+          ? tx.amountSatang
+          : Math.round(Number(tx.amount || 0) * 100);
+      if (tx.type === 'INCOME') {
+        incomeSatang += satang;
+      } else {
+        expenseSatang += satang;
+      }
+    }
+    return {
+      totalIncome: (incomeSatang / 100).toFixed(2),
+      totalExpense: (expenseSatang / 100).toFixed(2),
+      netBalance: ((incomeSatang - expenseSatang) / 100).toFixed(2),
+      isPositive: incomeSatang >= expenseSatang,
+      count: transactions.length,
+    };
+  }, [transactions]);
+
   const handleTypeChange = (nextType: TransactionType) => {
     setType(nextType);
     setFieldErrors((prev) => ({ ...prev, categoryId: undefined }));
@@ -211,19 +246,13 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
             : undefined),
       };
 
-      setTransactions((prev) => [
-        enrichedTransaction,
-        ...prev.filter((tx) => tx.id !== enrichedTransaction.id),
-      ]);
-      setAmount('');
-      setNote('');
-      setFieldErrors({});
+      setTransactions((prev) => [enrichedTransaction, ...prev]);
       navigate('/transactions');
     } catch (err) {
       const message =
         err instanceof ApiError
           ? err.message
-          : 'Failed to record transaction. Please check your input.';
+          : 'Failed to record transaction. Please check your inputs.';
       setFormError(message);
     } finally {
       setIsSubmitting(false);
@@ -235,113 +264,188 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
       <section className="page-section" aria-labelledby="transactions-heading">
         <div className="page-header">
           <div>
+            <div className="header-tag">
+              <SparkleIcon size={12} className="header-tag-icon" />
+              <span className="idol-tag-text">Personal Ledger</span>
+            </div>
             <h1 id="transactions-heading" className="page-title">
               {isNewMode ? 'Record Transaction' : 'My Transactions'}
             </h1>
             <p className="page-subtitle">
-              Track personal income and expenses in Thai Baht (THB).
+              {isNewMode
+                ? 'Record your income or expense with pastel elegance and precision.'
+                : 'Track your money flow with gentle pastel aesthetics and financial discipline.'}
             </p>
           </div>
-          {!isNewMode ? (
-            <Link to="/transactions/new" className="btn btn-primary">
-              Record Transaction
-            </Link>
-          ) : (
-            <Link to="/transactions" className="btn btn-secondary">
-              Back to Transactions
+
+          {!isNewMode && (
+            <Link to="/transactions/new" className="btn btn-primary btn-record-header">
+              <PlusIcon size={16} />
+              <span>Record Transaction</span>
             </Link>
           )}
         </div>
 
         {loadError && (
-          <div role="alert" className="alert alert-error">
+          <div className="alert alert-error" role="alert">
             {loadError}
           </div>
         )}
 
+        {/* Financial KPI Cards in Pastel Palette */}
+        {!isNewMode && (
+          <div className="idol-stats-grid">
+            <div className="stat-card stat-income">
+              <div className="stat-card-header">
+                <span className="stat-icon-wrapper icon-mint">
+                  <TrendingUpIcon size={18} />
+                </span>
+                <span className="stat-label">Total Income</span>
+              </div>
+              <div className="stat-value">฿{summary.totalIncome}</div>
+              <div className="stat-hint">Pastel mint inflow</div>
+            </div>
+
+            <div className="stat-card stat-expense">
+              <div className="stat-card-header">
+                <span className="stat-icon-wrapper icon-pink">
+                  <TrendingDownIcon size={18} />
+                </span>
+                <span className="stat-label">Total Expense</span>
+              </div>
+              <div className="stat-value">฿{summary.totalExpense}</div>
+              <div className="stat-hint">Pastel sakura outflow</div>
+            </div>
+
+            <div className="stat-card stat-balance">
+              <div className="stat-card-header">
+                <span className="stat-icon-wrapper icon-violet">
+                  <BalanceIcon size={18} />
+                </span>
+                <span className="stat-label">Net Balance</span>
+              </div>
+              <div
+                className={`stat-value ${
+                  summary.isPositive ? 'val-positive' : 'val-negative'
+                }`}
+              >
+                {summary.isPositive ? '+' : ''}฿{summary.netBalance}
+              </div>
+              <div className="stat-hint">
+                {summary.count} {summary.count === 1 ? 'transaction' : 'transactions'} logged
+              </div>
+            </div>
+          </div>
+        )}
+
         {isNewMode ? (
-          <div className="card">
+          <div className="card form-card form-card-stage">
+            <div className="card-stage-accent" />
+            <div className="card-header-styled">
+              <h2 className="card-title">New Entry Details</h2>
+              <span className="card-subtitle-note">
+                Record today's cash flow
+              </span>
+            </div>
+
             {formError && (
-              <div role="alert" className="alert alert-error">
+              <div className="alert alert-error" role="alert">
                 {formError}
               </div>
             )}
 
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              className="transaction-form"
-              aria-label="Record Transaction Form"
-            >
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="transaction-type" className="form-label">
-                    Type
-                  </label>
-                  <select
-                    id="transaction-type"
-                    name="type"
-                    className="form-input"
-                    value={type}
-                    onChange={(e) =>
-                      handleTypeChange(e.target.value as TransactionType)
-                    }
-                    disabled={isSubmitting}
+            <form onSubmit={handleSubmit} noValidate className="transaction-form">
+              <div className="form-group">
+                <label htmlFor="transaction-type" className="form-label">
+                  Type
+                </label>
+                <div className="type-toggle-bar">
+                  <button
+                    type="button"
+                    onClick={() => handleTypeChange('EXPENSE')}
+                    className={`type-toggle-btn ${
+                      type === 'EXPENSE' ? 'active-expense' : ''
+                    }`}
                   >
-                    <option value="EXPENSE">Expense (EXPENSE)</option>
-                    <option value="INCOME">Income (INCOME)</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="transaction-category" className="form-label">
-                    Category
-                  </label>
-                  <select
-                    id="transaction-category"
-                    name="categoryId"
-                    className="form-input"
-                    value={categoryId}
-                    onChange={(e) => {
-                      setCategoryId(e.target.value);
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        categoryId: undefined,
-                      }));
-                    }}
-                    disabled={isSubmitting || filteredCategories.length === 0}
+                    <TrendingDownIcon size={16} />
+                    <span>Expense</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTypeChange('INCOME')}
+                    className={`type-toggle-btn ${
+                      type === 'INCOME' ? 'active-income' : ''
+                    }`}
                   >
-                    {filteredCategories.length === 0 ? (
-                      <option value="">No active categories available</option>
-                    ) : (
-                      filteredCategories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                  {fieldErrors.categoryId && (
-                    <p className="field-error">{fieldErrors.categoryId}</p>
-                  )}
+                    <TrendingUpIcon size={16} />
+                    <span>Income</span>
+                  </button>
                 </div>
+                {/* Native select kept for test compatibility & full accessibility */}
+                <select
+                  id="transaction-type"
+                  name="type"
+                  value={type}
+                  onChange={(e) =>
+                    handleTypeChange(e.target.value as TransactionType)
+                  }
+                  className="form-input form-select-styled form-select-hidden"
+                  disabled={isSubmitting}
+                >
+                  <option value="EXPENSE">Expense (EXPENSE)</option>
+                  <option value="INCOME">Income (INCOME)</option>
+                </select>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="transaction-amount" className="form-label">
-                    Amount (THB)
-                  </label>
+              <div className="form-group">
+                <label htmlFor="transaction-category" className="form-label">
+                  Category
+                </label>
+                <select
+                  id="transaction-category"
+                  name="categoryId"
+                  value={categoryId}
+                  onChange={(e) => {
+                    setCategoryId(e.target.value);
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      categoryId: undefined,
+                    }));
+                  }}
+                  className="form-input form-select-styled"
+                  disabled={isSubmitting || filteredCategories.length === 0}
+                  required
+                >
+                  {filteredCategories.length === 0 ? (
+                    <option value="" disabled>
+                      No active categories for this type
+                    </option>
+                  ) : (
+                    filteredCategories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+                {fieldErrors.categoryId && (
+                  <p className="field-error">{fieldErrors.categoryId}</p>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="transaction-amount" className="form-label">
+                  Amount (THB)
+                </label>
+                <div className="amount-input-container">
+                  <span className="currency-pill">฿</span>
                   <input
                     id="transaction-amount"
                     name="amount"
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    max="9999999.99"
+                    type="text"
                     inputMode="decimal"
-                    placeholder="0.00"
-                    className="form-input"
+                    placeholder="e.g., 120.50"
+                    className="form-input amount-field"
                     value={amount}
                     onChange={(e) => {
                       setAmount(e.target.value);
@@ -352,35 +456,44 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
                     }}
                     disabled={isSubmitting}
                   />
-                  {fieldErrors.amount && (
-                    <p className="field-error">{fieldErrors.amount}</p>
-                  )}
                 </div>
+                {fieldErrors.amount && (
+                  <p className="field-error">{fieldErrors.amount}</p>
+                )}
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="transaction-date" className="form-label">
-                    Transaction Date
-                  </label>
-                  <input
-                    id="transaction-date"
-                    name="transactionDate"
-                    type="date"
-                    max={todayBangkok}
-                    className="form-input"
-                    value={transactionDate}
-                    onChange={(e) => {
-                      setTransactionDate(e.target.value);
-                      setFieldErrors((prev) => ({
-                        ...prev,
-                        transactionDate: undefined,
-                      }));
-                    }}
-                    disabled={isSubmitting}
-                  />
-                  {fieldErrors.transactionDate && (
-                    <p className="field-error">{fieldErrors.transactionDate}</p>
-                  )}
-                </div>
+              {/* GRAND OVERSIZED INTERACTIVE CALENDAR SELECTOR */}
+              <div className="form-group form-group-date">
+                <label
+                  htmlFor="transaction-date"
+                  className="form-label form-label-prominent"
+                >
+                  <CalendarIcon size={20} className="field-label-icon" />
+                  <span>Transaction Date</span>
+                </label>
+
+                <GrandCalendarPicker
+                  id="transaction-date"
+                  name="transactionDate"
+                  value={transactionDate}
+                  onChange={(nextDate) => {
+                    setTransactionDate(nextDate);
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      transactionDate: undefined,
+                    }));
+                  }}
+                  maxDate={todayBangkok}
+                  disabled={isSubmitting}
+                  required
+                />
+
+                <span className="field-helper-caption">
+                  Asia/Bangkok timezone standard • Max today (cannot record future date)
+                </span>
+                {fieldErrors.transactionDate && (
+                  <p className="field-error">{fieldErrors.transactionDate}</p>
+                )}
               </div>
 
               <div className="form-group">
@@ -392,7 +505,7 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
                   name="note"
                   rows={3}
                   placeholder="Optional note (up to 200 characters)"
-                  className="form-input"
+                  className="form-input form-textarea"
                   value={note}
                   onChange={(e) => {
                     setNote(e.target.value);
@@ -411,26 +524,46 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
                 </Link>
                 <button
                   type="submit"
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-save btn-idol-stage"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Saving...' : 'Save Transaction'}
+                  <SparkleIcon size={16} />
+                  <span>{isSubmitting ? 'Saving...' : 'Save Transaction'}</span>
                 </button>
               </div>
             </form>
           </div>
         ) : isLoading ? (
-          <div className="card" role="status">
+          <div className="card loading-card" role="status">
+            <span className="loading-spinner-svg">
+              <SakuraIcon size={28} className="spin-slow" />
+            </span>
             <p className="empty-state-text">Loading transactions...</p>
           </div>
         ) : sortedTransactions.length === 0 ? (
-          <div className="card empty-state-card">
-            <p className="empty-state-text">
-              No transactions recorded yet. Click 'Record Transaction' to start.
+          <div className="card empty-state-card empty-state-card-grand">
+            <div className="empty-wallet-graphic-wrapper">
+              <CuteWalletIllustration size={130} />
+            </div>
+            <h2 className="empty-state-title">No transactions recorded yet</h2>
+            <p className="empty-state-subtitle">
+              Start by adding your first transaction!
             </p>
+            <div className="empty-state-action">
+              <Link to="/transactions/new" className="btn btn-primary btn-record-empty">
+                <PlusIcon size={16} />
+                <span>Record Transaction</span>
+              </Link>
+            </div>
           </div>
         ) : (
-          <div className="card table-card">
+          <div className="card table-card table-card-stage">
+            <div className="table-header-title">
+              <h2 className="section-title">Ledger Entries</h2>
+              <span className="records-count-badge">
+                {sortedTransactions.length} records
+              </span>
+            </div>
             <div className="table-responsive">
               <table className="data-table" aria-label="Transactions">
                 <thead>
@@ -453,7 +586,7 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
                     const formattedAmount = formatAmountTHB(tx);
                     return (
                       <tr key={tx.id} data-testid="transaction-row">
-                        <td>{tx.transactionDate}</td>
+                        <td className="date-cell">{tx.transactionDate}</td>
                         <td>
                           <span
                             className={`type-badge ${
@@ -462,12 +595,29 @@ export const TransactionsPage: React.FC<{ isNewMode?: boolean }> = ({
                                 : 'type-expense'
                             }`}
                           >
+                            {tx.type === 'INCOME' ? (
+                              <TrendingUpIcon size={12} className="badge-arrow" />
+                            ) : (
+                              <TrendingDownIcon size={12} className="badge-arrow" />
+                            )}
                             {tx.type}
                           </span>
                         </td>
-                        <td>{categoryName}</td>
-                        <td>{tx.note || '—'}</td>
-                        <td className="amount-col">฿{formattedAmount}</td>
+                        <td className="category-cell">
+                          <span className="category-pill">{categoryName}</span>
+                        </td>
+                        <td className="note-cell">{tx.note || '—'}</td>
+                        <td className="amount-col">
+                          <span
+                            className={`amount-text ${
+                              tx.type === 'INCOME'
+                                ? 'amount-income'
+                                : 'amount-expense'
+                            }`}
+                          >
+                            ฿{formattedAmount}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
