@@ -1,11 +1,20 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { PrismaClient, Role, TransactionType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminPassword = process.env.ADMIN_PASSWORD || 'AdminInitial123!';
-  const demoUserPassword = process.env.DEMO_USER_PASSWORD || 'DemoInitial123!';
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const demoUserPassword = process.env.DEMO_USER_PASSWORD;
+
+  if (!adminPassword || !demoUserPassword) {
+    throw new Error(
+      'Missing required environment variables: ADMIN_PASSWORD and DEMO_USER_PASSWORD must be provided to seed the database.'
+    );
+  }
 
   const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
   const demoUserPasswordHash = await bcrypt.hash(demoUserPassword, 10);

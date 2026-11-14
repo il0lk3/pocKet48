@@ -48,7 +48,7 @@ CREATE TABLE "transactions" (
     "type" "TransactionType" NOT NULL,
     "amountSatang" BIGINT NOT NULL,
     "transactionDate" TEXT NOT NULL,
-    "note" TEXT,
+    "note" VARCHAR(200),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
