@@ -65,7 +65,7 @@ model Transaction {
   type            TransactionType
   amountSatang    BigInt
   transactionDate String
-  note            String?
+  note            String?         @db.VarChar(200)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
