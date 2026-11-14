@@ -1,7 +1,16 @@
 # Sprint 1 Engineering Contracts: Pocket48
 
-Version 0.1 (DRAFT). Sprint: 1. Target Checkpoint: Deliverable 1 (8 Nov 2026).  
+Version 1.0 (BASELINE). Sprint: 1. Target Checkpoint: Deliverable 1 (8 Nov 2026).  
 Project: Pocket48 — Personal Money and Expense Logging System.
+
+---
+
+## Revision History
+
+| Version | Date | Author / Reviewer | Changes | Reason | PR / Commit |
+|---|---|---|---|---|---|
+| 0.1 | 10 Nov 2026 | Team | Initial draft contracts | Initial project baseline | Commit `670a09b` |
+| 1.0 | 14 Nov 2026 | @il0lk3 / @Achikan | Added revision history, completed 1:1 AC-to-STS mappings (TEST-01 to TEST-18), documented known limitations | Issue #3 review before coding | PR #25 (Branch `docs/3-sprint1-contract-review`) |
 
 ---
 
@@ -83,7 +92,7 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 ### F-06: Delivery Baseline (Cross-cutting)
 * **Linked Requirements:** NFR-05, NFR-08
 * **Acceptance Criteria:**
-  * **AC-06-01 (Clean Clone Execution):** Running `npm install && npx prisma migrate deploy && npm run seed && npm test` succeeds from a fresh clone using only `.env.example`.
+  * **AC-06-01 (Clean Clone Execution):** Running `npm install && npx prisma migrate deploy && npm run prisma:seed && npm test` succeeds from a fresh clone using only `.env.example`.
   * **AC-06-02 (Zero Committed Secrets):** No password, connection string, or secret appears in repository files.
 
 ---
@@ -105,6 +114,11 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 | **TEST-11** | AC-05-03 | Integration (Security) | Administrator is signed in | GET `/api/transactions` | 403 Forbidden (Admin privacy restriction) |
 | **TEST-12** | AC-04-02 | Integration (API) | Category "Food" exists | Admin POST `/api/categories` with name `"food"` | 400 Bad Request (Duplicate name case-insensitive) |
 | **TEST-13** | AC-06-01 | End-to-End (UI) | App running locally from clean clone | Playwright E2E: User logs in, creates expense, verifies in table | Journey completes successfully without UI glitches |
+| **TEST-14** | AC-01-04 | Integration (API) | Seeded user is `USER` role | Request login and examine `me` endpoint; forge role payload | Role strictly returns `USER` irrespective of client request |
+| **TEST-15** | AC-03-02 | Integration (API) | User A and User B both have transactions | User A calls GET `/api/transactions` | List contains 100% User A transactions; 0 of User B |
+| **TEST-16** | AC-04-01 | Integration (API) | Administrator is signed in | POST `/api/categories` with `{ "name": "Health", "type": "EXPENSE" }` | 201 Created, category persists in database |
+| **TEST-17** | AC-05-01 | Integration (Security) | No session cookie provided | GET `/api/transactions`, GET `/api/categories` | 401 Unauthorized for all protected routes |
+| **TEST-18** | AC-06-02 | Repository (Hygiene) | Git repository working tree | Scan repository files for `.env`, passwords, or secret keys | Zero leaks detected; `.env.example` contains only placeholders |
 
 ---
 
@@ -121,3 +135,15 @@ A Sprint 1 feature is complete only when all of the following conditions are met
 5. **Quality Gate:** Passes the CI pipeline (`test-and-docker`) before merging into `staging` and `main`.
 6. **Documentation & Hygiene:** Setup instructions in `README.md` and `.env.example` remain accurate; no secrets are committed.
 
+---
+
+## 4. Known Limitations & Scope Exclusions for Sprint 1
+
+The following capabilities are explicitly deferred to later sprints in accordance with `docs/sprints/plan.md`:
+* **Transaction Management (F-07):** Viewing full transaction detail, editing, and deleting transactions are deferred to Sprint 2.
+* **Filtering & Search (F-08):** Filtering by month, type, and category is deferred to Sprint 2.
+* **Monthly Summary & Balance Cards (F-09):** Aggregated monthly income, expense totals, and category breakdown are deferred to Sprint 2.
+* **Category Lifecycle (F-10):** Renaming and deactivating categories by Administrator are deferred to Sprint 2.
+* **Account Administration (F-11):** Administrator UI for activating and deactivating user accounts is deferred to Sprint 2.
+* **Monthly Budgets (F-13):** Setting budgets per category and overspending warnings are deferred to Sprint 3.
+* **CSV Export (F-14):** Exporting transaction history to CSV format is deferred to Sprint 3.
