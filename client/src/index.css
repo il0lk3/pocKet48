@@ -404,6 +404,7 @@ html, body {
   font-weight: 900;
   background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 45%, #ec4899 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   letter-spacing: -0.3px;
@@ -418,6 +419,7 @@ html, body {
 .auth-brand-title .brand-48 {
   background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 45%, #ec4899 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 4px 14px rgba(168, 85, 247, 0.35));
 }
@@ -425,6 +427,7 @@ html, body {
 .auth-title .brand-48 {
   background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -1730,6 +1733,7 @@ html, body {
   line-height: 1;
   background: var(--grad-stage-accent);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.85rem;
 }
