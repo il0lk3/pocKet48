@@ -11,21 +11,6 @@ interface GrandCalendarPickerProps {
   required?: boolean;
 }
 
-const THAI_MONTHS = [
-  'มกราคม',
-  'กุมภาพันธ์',
-  'มีนาคม',
-  'เมษายน',
-  'พฤษภาคม',
-  'มิถุนายน',
-  'กรกฎาคม',
-  'สิงหาคม',
-  'กันยายน',
-  'ตุลาคม',
-  'พฤศจิกายน',
-  'ธันวาคม',
-];
-
 const EN_MONTHS = [
   'January',
   'February',
@@ -42,13 +27,13 @@ const EN_MONTHS = [
 ];
 
 const WEEKDAYS = [
-  { th: 'อา', en: 'Sun', isWeekend: true },
-  { th: 'จ', en: 'Mon', isWeekend: false },
-  { th: 'อ', en: 'Tue', isWeekend: false },
-  { th: 'พ', en: 'Wed', isWeekend: false },
-  { th: 'พฤ', en: 'Thu', isWeekend: false },
-  { th: 'ศ', en: 'Fri', isWeekend: false },
-  { th: 'ส', en: 'Sat', isWeekend: true },
+  { en: 'Sun', isWeekend: true },
+  { en: 'Mon', isWeekend: false },
+  { en: 'Tue', isWeekend: false },
+  { en: 'Wed', isWeekend: false },
+  { en: 'Thu', isWeekend: false },
+  { en: 'Fri', isWeekend: false },
+  { en: 'Sat', isWeekend: true },
 ];
 
 export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
@@ -202,8 +187,6 @@ export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
     return cells;
   }, [viewYear, viewMonth, maxDate, value]);
 
-  const thaiBuddhistYear = viewYear + 543;
-
   return (
     <div className="grand-calendar-widget">
       {/* Top Value Display & Input for Automated Tests & Form Submission */}
@@ -217,6 +200,7 @@ export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
           id={id}
           name={name}
           type="date"
+          lang="en-US"
           max={maxDate}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -233,7 +217,7 @@ export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
             className={`quick-chip ${value === maxDate ? 'quick-chip-active' : ''}`}
           >
             <SparkleIcon size={12} />
-            <span>วันนี้ (Today)</span>
+            <span>Today</span>
           </button>
           <button
             type="button"
@@ -241,7 +225,7 @@ export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
             disabled={disabled}
             className="quick-chip"
           >
-            <span>เมื่อวาน (Yesterday)</span>
+            <span>Yesterday</span>
           </button>
         </div>
       </div>
@@ -261,10 +245,7 @@ export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
           </button>
 
           <div className="calendar-month-heading">
-            <span className="thai-month-label">
-              {THAI_MONTHS[viewMonth]} {thaiBuddhistYear}
-            </span>
-            <span className="en-month-sub">
+            <span className="en-month-main">
               {EN_MONTHS[viewMonth]} {viewYear}
             </span>
           </div>
@@ -287,8 +268,7 @@ export const GrandCalendarPicker: React.FC<GrandCalendarPickerProps> = ({
               key={wd.en}
               className={`weekday-label ${wd.isWeekend ? 'weekend-label' : ''}`}
             >
-              <span className="th-day">{wd.th}</span>
-              <span className="en-day">{wd.en}</span>
+              <span className="en-day-single">{wd.en}</span>
             </div>
           ))}
         </div>

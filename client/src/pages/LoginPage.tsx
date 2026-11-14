@@ -4,7 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../api/client';
 import { SakuraBackground } from '../components/SakuraBackground';
 import { AmbianceSwitcher } from '../components/AmbianceSwitcher';
-import { SakuraIcon, SparkleIcon, MailIcon, LockIcon } from '../components/Icons';
+import {
+  SakuraIcon,
+  SparkleIcon,
+  MailIcon,
+  LockIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from '../components/Icons';
 
 export const LoginPage: React.FC = () => {
   const { user, isLoading, login } = useAuth();
@@ -13,6 +20,7 @@ export const LoginPage: React.FC = () => {
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [formError, setFormError] = useState<string>('');
@@ -107,7 +115,7 @@ export const LoginPage: React.FC = () => {
             <div className="auth-logo-pulse-ring" />
             <SakuraIcon size={38} className="auth-sakura-icon" />
           </div>
-          <div className="auth-brand-title">Pocket48</div>
+          <div className="auth-brand-title">Pocket<span className="brand-48">48</span></div>
           <p className="auth-brand-motto">
             Track your income, manage your expenses
           </p>
@@ -115,7 +123,9 @@ export const LoginPage: React.FC = () => {
 
         {/* Grand Glassmorphic Card matching Reference Image 1 */}
         <div className="auth-card auth-card-extravagant">
-          <h1 className="auth-title">Sign In to Pocket48</h1>
+          <h1 className="auth-title" aria-label="Sign In to Pocket48">
+            Sign In to Pocket<span className="brand-48">48</span>
+          </h1>
           <p className="auth-subtitle">Welcome back!</p>
 
           {formError && (
@@ -165,15 +175,24 @@ export const LoginPage: React.FC = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   aria-invalid={Boolean(passwordError)}
                   aria-describedby={passwordError ? 'password-error' : undefined}
-                  className="form-input form-input-with-icon"
+                  className="form-input form-input-with-icon form-input-with-trail"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="input-trail-icon-btn"
+                  aria-label={showPassword ? 'Hide secret text' : 'Show secret text'}
+                  title={showPassword ? 'Hide secret text' : 'Show secret text'}
+                >
+                  {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                </button>
               </div>
               {passwordError && (
                 <p id="password-error" className="field-error" role="alert">
