@@ -14,6 +14,105 @@ export const transactionsRouter = Router();
 // Transactions routes require authenticated USER (AC-05-03, BR-07)
 transactionsRouter.use(requireRole(['USER']));
 
+// GET /api/transactions — List user's own transactions (F-03, AC-03-01, AC-03-02, TEST-08, TEST-15)
+transactionsRouter.get('/', async (req: Request, res: Response) => {
+  try {
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        userId: req.user!.id,
+      },
+      orderBy: [
+        { transactionDate: 'desc' },
+        { createdAt: 'desc' },
+      ],
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+      },
+    });
+
+    const formatted = transactions.map((tx) => ({
+      id: tx.id,
+      amount: Number(tx.amountSatang) / 100,
+      amountSatang: Number(tx.amountSatang),
+      type: tx.type,
+      transactionDate: tx.transactionDate,
+      category: tx.category,
+      note: tx.note,
+      createdAt: tx.createdAt.toISOString(),
+    }));
+
+    return res.status(200).json({
+      data: formatted,
+    });
+  } catch {
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to retrieve transactions',
+      },
+    });
+  }
+});
+
+// GET /api/transactions/:id — Retrieve own transaction in full (FR-08, BR-04, AC-05-02, TEST-09)
+transactionsRouter.get('/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        id,
+        userId: req.user!.id,
+      },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+      },
+    });
+
+    // Isolation: If transaction does not exist or belongs to another user, return 404 (BR-04, D-04)
+    if (!transaction) {
+      return res.status(404).json({
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Transaction not found',
+        },
+      });
+    }
+
+    return res.status(200).json({
+      data: {
+        id: transaction.id,
+        amount: Number(transaction.amountSatang) / 100,
+        amountSatang: Number(transaction.amountSatang),
+        type: transaction.type,
+        transactionDate: transaction.transactionDate,
+        category: transaction.category,
+        note: transaction.note,
+        createdAt: transaction.createdAt.toISOString(),
+      },
+    });
+  } catch {
+    return res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to retrieve transaction',
+      },
+    });
+  }
+});
+
 // POST /api/transactions — Record a new transaction (F-02, AC-02-01 to AC-02-04)
 transactionsRouter.post('/', async (req: Request, res: Response) => {
   const { type, amount, categoryId, transactionDate, note } = req.body || {};
