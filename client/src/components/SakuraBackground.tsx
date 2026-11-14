@@ -16,15 +16,15 @@ export const SakuraBackground: React.FC = () => {
   const { mode } = useAmbiance();
 
   const particles: ParticleConfig[] = useMemo(() => {
-    return Array.from({ length: 26 }, (_, i) => ({
+    return Array.from({ length: 28 }, (_, i) => ({
       id: i,
-      left: (i * 3.8 + (i % 5) * 2.8) % 100,
-      delay: -(i * 1.1) % 16,
+      left: (i * 3.6 + (i % 5) * 2.6) % 100,
+      delay: -(i * 1.05) % 16,
       duration: 10 + (i % 6) * 2.4,
-      scale: 0.7 + (i % 5) * 0.15,
+      scale: 0.7 + (i % 5) * 0.16,
       swayDuration: 2.6 + (i % 4) * 1.1,
       initialRotation: (i * 57) % 360,
-      opacity: 0.5 + (i % 4) * 0.14,
+      opacity: 0.5 + (i % 4) * 0.15,
     }));
   }, []);
 
@@ -33,134 +33,273 @@ export const SakuraBackground: React.FC = () => {
       {/* Sky Atmosphere Mesh Gradients */}
       <div className="sky-atmosphere" />
 
-      {/* Mode: SAKURA (Lush Cherry Blossom Canopy framing the top ceiling & corners cleanly) */}
+      {/* Mode: SAKURA (Grand, Extravagant Japanese Cherry Blossom Canopies) */}
       {mode === 'sakura' && (
         <>
-          {/* Top-Left Sakura Canopy: Curves horizontally along top border, never intruding on content */}
+          {/* Top-Left Grand Extravagant Sakura Canopy */}
           <div className="sakura-tree-canopy-top-left">
             <svg
-              viewBox="0 0 540 140"
+              viewBox="0 0 640 440"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="canopy-svg"
             >
-              {/* Graceful horizontal sakura branches framing top ceiling */}
+              {/* Grand Ancient Sakura Boughs */}
               <path
-                d="M -30 -10 C 60 22, 140 18, 230 38 C 320 54, 410 46, 510 58"
+                d="M -30 -20 C 90 40, 190 30, 310 90 C 400 135, 480 145, 590 190 C 620 202, 640 215, 650 225"
+                stroke="#6e4d3b"
+                strokeWidth="13"
+                strokeLinecap="round"
+                opacity="0.8"
+              />
+              <path
+                d="M 130 35 C 190 85, 235 150, 315 220 C 370 270, 420 300, 490 350"
                 stroke="#7a5847"
+                strokeWidth="8.5"
+                strokeLinecap="round"
+                opacity="0.75"
+              />
+              <path
+                d="M 280 85 C 360 65, 430 75, 510 55 C 550 45, 590 50, 620 40"
+                stroke="#7a5847"
+                strokeWidth="6"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+              <path
+                d="M 220 130 C 265 175, 305 210, 360 260 C 400 295, 435 320, 470 340"
+                stroke="#7a5847"
+                strokeWidth="4.5"
+                strokeLinecap="round"
+                opacity="0.65"
+              />
+              <path
+                d="M 440 120 C 490 160, 540 185, 590 220"
+                stroke="#7a5847"
+                strokeWidth="4"
+                strokeLinecap="round"
+                opacity="0.6"
+              />
+
+              {/* Rich Multi-layered Blossom Clouds & Clusters */}
+              {/* 1. Base Corner Blossom Cloud */}
+              <circle cx="70" cy="50" r="48" fill="#fda4bc" opacity="0.45" filter="blur(16px)" />
+              <circle cx="110" cy="75" r="34" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="80" cy="55" r="28" fill="#f472b6" opacity="0.82" />
+              <circle cx="50" cy="80" r="26" fill="#ffffff" opacity="0.95" />
+              <circle cx="130" cy="50" r="22" fill="#fca5bc" opacity="0.88" />
+              <circle cx="95" cy="110" r="24" fill="#ffd6e3" opacity="0.88" />
+
+              {/* 2. Mid-Bough Extravagant Cluster */}
+              <circle cx="230" cy="100" r="54" fill="#fda4bc" opacity="0.5" filter="blur(18px)" />
+              <circle cx="215" cy="85" r="36" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="260" cy="115" r="32" fill="#f472b6" opacity="0.82" />
+              <circle cx="185" cy="105" r="28" fill="#ffffff" opacity="0.95" />
+              <circle cx="275" cy="85" r="24" fill="#fca5bc" opacity="0.88" />
+              <circle cx="305" cy="110" r="20" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="240" cy="140" r="26" fill="#ffd6e3" opacity="0.85" />
+
+              {/* 3. Lower Cascading Bough Cluster */}
+              <circle cx="330" cy="225" r="46" fill="#fda4bc" opacity="0.45" filter="blur(16px)" />
+              <circle cx="310" cy="205" r="32" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="355" cy="240" r="28" fill="#f472b6" opacity="0.82" />
+              <circle cx="370" cy="200" r="22" fill="#ffffff" opacity="0.92" />
+              <circle cx="435" cy="305" r="28" fill="#ffd6e3" opacity="0.88" />
+              <circle cx="460" cy="325" r="22" fill="#f472b6" opacity="0.82" />
+              <circle cx="485" cy="355" r="18" fill="#ffffff" opacity="0.95" />
+
+              {/* 4. Upper Outstretching Bough Cluster */}
+              <circle cx="460" cy="75" r="42" fill="#fda4bc" opacity="0.45" filter="blur(14px)" />
+              <circle cx="445" cy="68" r="28" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="485" cy="88" r="24" fill="#f472b6" opacity="0.82" />
+              <circle cx="525" cy="60" r="22" fill="#ffd6e3" opacity="0.88" />
+              <circle cx="555" cy="55" r="16" fill="#ffffff" opacity="0.95" />
+              <circle cx="610" cy="45" r="14" fill="#ffd6e3" opacity="0.9" />
+
+              {/* 5. Lateral Outreaching Bough Cluster */}
+              <circle cx="530" cy="180" r="44" fill="#fda4bc" opacity="0.45" filter="blur(14px)" />
+              <circle cx="515" cy="170" r="28" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="550" cy="195" r="24" fill="#f472b6" opacity="0.82" />
+              <circle cx="585" cy="205" r="20" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="615" cy="225" r="16" fill="#ffffff" opacity="0.95" />
+            </svg>
+          </div>
+
+          {/* Top-Right Counter-Balancing Sakura Canopy */}
+          <div className="sakura-tree-canopy-top-right">
+            <svg
+              viewBox="0 0 420 320"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="canopy-svg"
+            >
+              <path
+                d="M 440 -15 C 340 35, 260 50, 160 85 C 105 105, 50 130, 10 160"
+                stroke="#6e4d3b"
                 strokeWidth="9"
                 strokeLinecap="round"
                 opacity="0.75"
               />
               <path
-                d="M 110 20 C 170 36, 230 42, 300 48 C 360 54, 420 58, 470 64"
+                d="M 280 45 C 210 95, 170 135, 100 185 C 65 210, 35 235, 15 255"
                 stroke="#7a5847"
                 strokeWidth="5.5"
                 strokeLinecap="round"
-                opacity="0.68"
+                opacity="0.7"
               />
               <path
-                d="M 250 38 C 290 52, 340 62, 390 70"
+                d="M 210 75 C 170 115, 140 145, 90 180"
                 stroke="#7a5847"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 opacity="0.6"
               />
 
-              {/* Rich Multi-layered Blossom Clusters along the top arch */}
-              {/* Corner Cluster (Extreme Top-Left) */}
-              <circle cx="50" cy="30" r="32" fill="#fda4bc" opacity="0.45" filter="blur(10px)" />
-              <circle cx="85" cy="45" r="24" fill="#ffd6e3" opacity="0.9" />
-              <circle cx="60" cy="35" r="20" fill="#f472b6" opacity="0.82" />
-              <circle cx="40" cy="50" r="18" fill="#ffffff" opacity="0.9" />
-              <circle cx="105" cy="32" r="16" fill="#fca5bc" opacity="0.85" />
-
-              {/* Mid-Arch Blossom Cluster (Ceiling) */}
-              <circle cx="190" cy="40" r="34" fill="#fda4bc" opacity="0.45" filter="blur(12px)" />
-              <circle cx="175" cy="35" r="24" fill="#ffd6e3" opacity="0.9" />
-              <circle cx="210" cy="48" r="22" fill="#f472b6" opacity="0.8" />
-              <circle cx="155" cy="46" r="18" fill="#ffffff" opacity="0.9" />
-              <circle cx="225" cy="34" r="16" fill="#fca5bc" opacity="0.85" />
-              <circle cx="245" cy="48" r="14" fill="#ffd6e3" opacity="0.9" />
-
-              {/* Outer Bough Cluster */}
-              <circle cx="330" cy="50" r="30" fill="#fda4bc" opacity="0.4" filter="blur(10px)" />
-              <circle cx="315" cy="46" r="20" fill="#ffd6e3" opacity="0.88" />
-              <circle cx="345" cy="56" r="18" fill="#f472b6" opacity="0.8" />
-              <circle cx="360" cy="44" r="15" fill="#ffffff" opacity="0.9" />
-
-              {/* Delicate Outreaching Tips */}
-              <circle cx="430" cy="54" r="22" fill="#ffd6e3" opacity="0.88" />
-              <circle cx="450" cy="60" r="18" fill="#f472b6" opacity="0.8" />
-              <circle cx="485" cy="56" r="16" fill="#ffd6e3" opacity="0.85" />
-              <circle cx="505" cy="60" r="12" fill="#ffffff" opacity="0.95" />
-            </svg>
-          </div>
-
-          {/* Top-Right Counter-Balancing Sakura Canopy Corner */}
-          <div className="sakura-tree-canopy-top-right">
-            <svg
-              viewBox="0 0 320 120"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="canopy-svg"
-            >
-              <path
-                d="M 340 -10 C 270 20, 200 30, 120 45 C 80 52, 40 60, 10 70"
-                stroke="#7a5847"
-                strokeWidth="6"
-                strokeLinecap="round"
-                opacity="0.65"
-              />
-              <path
-                d="M 220 25 C 170 45, 130 55, 80 68"
-                stroke="#7a5847"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                opacity="0.6"
-              />
-              {/* Blossom clusters right ceiling */}
-              <circle cx="250" cy="22" r="26" fill="#fda4bc" opacity="0.4" filter="blur(10px)" />
-              <circle cx="230" cy="26" r="18" fill="#ffd6e3" opacity="0.85" />
-              <circle cx="265" cy="32" r="15" fill="#f472b6" opacity="0.8" />
-              <circle cx="180" cy="38" r="20" fill="#ffd6e3" opacity="0.85" />
-              <circle cx="150" cy="42" r="16" fill="#ffffff" opacity="0.9" />
-              <circle cx="120" cy="48" r="14" fill="#fca5bc" opacity="0.8" />
-              <circle cx="65" cy="62" r="16" fill="#ffd6e3" opacity="0.85" />
-              <circle cx="45" cy="68" r="12" fill="#f472b6" opacity="0.8" />
+              {/* Blossom clusters right corner */}
+              <circle cx="330" cy="35" r="40" fill="#fda4bc" opacity="0.42" filter="blur(14px)" />
+              <circle cx="310" cy="40" r="28" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="350" cy="55" r="22" fill="#f472b6" opacity="0.82" />
+              <circle cx="230" cy="70" r="32" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="190" cy="80" r="24" fill="#ffffff" opacity="0.92" />
+              <circle cx="150" cy="95" r="22" fill="#fca5bc" opacity="0.85" />
+              <circle cx="115" cy="155" r="28" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="85" cy="180" r="22" fill="#f472b6" opacity="0.82" />
+              <circle cx="55" cy="205" r="18" fill="#ffffff" opacity="0.95" />
+              <circle cx="25" cy="245" r="16" fill="#ffd6e3" opacity="0.88" />
             </svg>
           </div>
         </>
       )}
 
-      {/* Mode: MINT (Fresh Morning Garden Foliage along ceiling) */}
+      {/* Mode: MINT (Grand, Extravagant CGM48 Fresh Mint Garden Canopies) */}
       {mode === 'mint' && (
-        <div className="mint-tree-canopy-top-left">
-          <svg
-            viewBox="0 0 460 130"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="canopy-svg"
-          >
-            <path
-              d="M -20 -10 C 70 25, 160 22, 250 45 C 310 60, 370 55, 430 70"
-              stroke="#4a6b58"
-              strokeWidth="7"
-              strokeLinecap="round"
-              opacity="0.65"
-            />
-            {/* Mint Leaf Bunches */}
-            <circle cx="110" cy="35" r="26" fill="#a7f3d0" opacity="0.5" filter="blur(10px)" />
-            <circle cx="95" cy="30" r="18" fill="#dcfce9" opacity="0.88" />
-            <circle cx="125" cy="40" r="15" fill="#6ee7b7" opacity="0.8" />
-            <circle cx="220" cy="46" r="28" fill="#a7f3d0" opacity="0.5" filter="blur(10px)" />
-            <circle cx="205" cy="42" r="20" fill="#dcfce9" opacity="0.9" />
-            <circle cx="235" cy="52" r="16" fill="#4ade8d" opacity="0.8" />
-            <circle cx="330" cy="58" r="24" fill="#a7f3d0" opacity="0.5" filter="blur(8px)" />
-            <circle cx="320" cy="54" r="16" fill="#dcfce9" opacity="0.88" />
-            <circle cx="345" cy="64" r="14" fill="#34d399" opacity="0.8" />
-          </svg>
-        </div>
+        <>
+          {/* Top-Left Grand Extravagant Mint Canopy */}
+          <div className="mint-tree-canopy-top-left">
+            <svg
+              viewBox="0 0 640 440"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="canopy-svg"
+            >
+              {/* Graceful Forest Green Botanical Branches */}
+              <path
+                d="M -30 -20 C 80 40, 180 30, 290 85 C 380 130, 460 140, 570 185 C 605 198, 630 210, 645 220"
+                stroke="#325340"
+                strokeWidth="12"
+                strokeLinecap="round"
+                opacity="0.8"
+              />
+              <path
+                d="M 125 35 C 185 85, 230 145, 305 215 C 360 265, 410 295, 480 345"
+                stroke="#406952"
+                strokeWidth="8"
+                strokeLinecap="round"
+                opacity="0.75"
+              />
+              <path
+                d="M 270 80 C 350 60, 420 70, 500 50 C 540 40, 580 45, 610 35"
+                stroke="#406952"
+                strokeWidth="5.5"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+              <path
+                d="M 210 125 C 255 170, 295 205, 350 255 C 390 290, 425 315, 460 335"
+                stroke="#4a7a5f"
+                strokeWidth="4"
+                strokeLinecap="round"
+                opacity="0.65"
+              />
+
+              {/* Rich Multi-layered Fresh Mint Foliage Clouds */}
+              {/* 1. Base Corner Mint Cloud */}
+              <circle cx="70" cy="50" r="48" fill="#a7f3d0" opacity="0.5" filter="blur(16px)" />
+              <circle cx="110" cy="75" r="35" fill="#dcfce9" opacity="0.92" />
+              <circle cx="80" cy="55" r="28" fill="#6ee7b7" opacity="0.85" />
+              <circle cx="50" cy="80" r="26" fill="#ffffff" opacity="0.95" />
+              <circle cx="130" cy="50" r="24" fill="#34d399" opacity="0.85" />
+              <circle cx="95" cy="110" r="24" fill="#86efac" opacity="0.9" />
+
+              {/* 2. Mid-Bough Mint Foliage Cluster */}
+              <circle cx="230" cy="95" r="54" fill="#a7f3d0" opacity="0.5" filter="blur(18px)" />
+              <circle cx="215" cy="80" r="38" fill="#dcfce9" opacity="0.92" />
+              <circle cx="260" cy="110" r="32" fill="#34d399" opacity="0.85" />
+              <circle cx="185" cy="100" r="28" fill="#ecfdf5" opacity="0.95" />
+              <circle cx="275" cy="80" r="26" fill="#6ee7b7" opacity="0.88" />
+              <circle cx="305" cy="105" r="22" fill="#10b981" opacity="0.8" />
+              <circle cx="240" cy="135" r="26" fill="#86efac" opacity="0.88" />
+
+              {/* 3. Lower Cascading Foliage Cluster */}
+              <circle cx="325" cy="220" r="46" fill="#a7f3d0" opacity="0.45" filter="blur(16px)" />
+              <circle cx="305" cy="200" r="32" fill="#dcfce9" opacity="0.9" />
+              <circle cx="350" cy="235" r="28" fill="#34d399" opacity="0.85" />
+              <circle cx="365" cy="195" r="24" fill="#ffffff" opacity="0.92" />
+              <circle cx="430" cy="300" r="28" fill="#6ee7b7" opacity="0.88" />
+              <circle cx="455" cy="320" r="22" fill="#10b981" opacity="0.8" />
+              <circle cx="480" cy="350" r="18" fill="#dcfce9" opacity="0.95" />
+
+              {/* 4. Upper Outstretching Mint Sprigs */}
+              <circle cx="450" cy="70" r="42" fill="#a7f3d0" opacity="0.45" filter="blur(14px)" />
+              <circle cx="435" cy="62" r="28" fill="#dcfce9" opacity="0.92" />
+              <circle cx="475" cy="82" r="24" fill="#34d399" opacity="0.85" />
+              <circle cx="515" cy="55" r="22" fill="#86efac" opacity="0.88" />
+              <circle cx="545" cy="50" r="16" fill="#ffffff" opacity="0.95" />
+              <circle cx="600" cy="40" r="15" fill="#6ee7b7" opacity="0.9" />
+
+              {/* 5. Lateral Outreaching Tips */}
+              <circle cx="520" cy="175" r="44" fill="#a7f3d0" opacity="0.45" filter="blur(14px)" />
+              <circle cx="505" cy="165" r="28" fill="#dcfce9" opacity="0.92" />
+              <circle cx="540" cy="190" r="24" fill="#34d399" opacity="0.85" />
+              <circle cx="575" cy="200" r="20" fill="#86efac" opacity="0.9" />
+              <circle cx="605" cy="220" r="16" fill="#ffffff" opacity="0.95" />
+            </svg>
+          </div>
+
+          {/* Top-Right Counter-Balancing Mint Canopy */}
+          <div className="mint-tree-canopy-top-right">
+            <svg
+              viewBox="0 0 420 320"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="canopy-svg"
+            >
+              <path
+                d="M 440 -15 C 340 35, 260 50, 160 85 C 105 105, 50 130, 10 160"
+                stroke="#325340"
+                strokeWidth="9"
+                strokeLinecap="round"
+                opacity="0.75"
+              />
+              <path
+                d="M 280 45 C 210 95, 170 135, 100 185 C 65 210, 35 235, 15 255"
+                stroke="#406952"
+                strokeWidth="5.5"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+              <path
+                d="M 210 75 C 170 115, 140 145, 90 180"
+                stroke="#4a7a5f"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                opacity="0.6"
+              />
+
+              {/* Foliage clusters right corner */}
+              <circle cx="330" cy="35" r="40" fill="#a7f3d0" opacity="0.45" filter="blur(14px)" />
+              <circle cx="310" cy="40" r="28" fill="#dcfce9" opacity="0.92" />
+              <circle cx="350" cy="55" r="22" fill="#34d399" opacity="0.85" />
+              <circle cx="230" cy="70" r="32" fill="#86efac" opacity="0.9" />
+              <circle cx="190" cy="80" r="24" fill="#ffffff" opacity="0.92" />
+              <circle cx="150" cy="95" r="22" fill="#6ee7b7" opacity="0.88" />
+              <circle cx="115" cy="155" r="28" fill="#dcfce9" opacity="0.92" />
+              <circle cx="85" cy="180" r="22" fill="#34d399" opacity="0.85" />
+              <circle cx="55" cy="205" r="18" fill="#ffffff" opacity="0.95" />
+              <circle cx="25" cy="245" r="16" fill="#86efac" opacity="0.9" />
+            </svg>
+          </div>
+        </>
       )}
 
       {/* Stage Dual Spotlights Beaming Down */}
@@ -225,11 +364,11 @@ export const SakuraBackground: React.FC = () => {
                 >
                   <path
                     d="M12 2 C8 5, 4 10, 6 16 C8 22, 16 23, 19 18 C22 13, 20 6, 15 3 C13.5 2, 12.8 2, 12 2 Z"
-                    fill="url(#petalPinkGradClean)"
+                    fill="url(#petalPinkGradGrand)"
                   />
                   <defs>
                     <linearGradient
-                      id="petalPinkGradClean"
+                      id="petalPinkGradGrand"
                       x1="0%"
                       y1="0%"
                       x2="100%"
@@ -277,11 +416,11 @@ export const SakuraBackground: React.FC = () => {
                 >
                   <path
                     d="M12 2 C6 5, 3 11, 5 18 C7 23, 15 24, 19 19 C23 14, 21 7, 16 3 C14 2, 13 2, 12 2 Z"
-                    fill="url(#petalMintGradClean)"
+                    fill="url(#petalMintGradGrand)"
                   />
                   <defs>
                     <linearGradient
-                      id="petalMintGradClean"
+                      id="petalMintGradGrand"
                       x1="0%"
                       y1="0%"
                       x2="100%"
