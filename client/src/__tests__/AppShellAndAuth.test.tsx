@@ -33,6 +33,7 @@ describe('Issue #9: Client login, app shell, and role-aware navigation', () => {
 
   beforeEach(() => {
     fetchMock.mockReset();
+    fetchMock.mockResolvedValue(mockJsonResponse(200, { data: [] }));
     vi.stubGlobal('fetch', fetchMock);
   });
 
