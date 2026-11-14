@@ -68,7 +68,7 @@ describe('F-01: Authentication & Session Contracts (TDD)', () => {
     expect(res.body.data.password).toBeUndefined();
     expect(res.body.data.passwordHash).toBeUndefined();
 
-    // Verify session cookie
+    // Verify session cookie is set and HttpOnly
     const cookies = res.headers['set-cookie'];
     expect(cookies).toBeDefined();
     const sessionCookie = cookies?.find((c: string) => c.startsWith('pocket48_session='));
@@ -112,6 +112,52 @@ describe('F-01: Authentication & Session Contracts (TDD)', () => {
     const res = await request(app).get('/api/auth/me');
     expect(res.status).toBe(401);
     expect(res.body.error).toBeDefined();
+  });
+
+  it('Unauthenticated POST /api/auth/logout returns 401 (system-sds.md Section 3.3 matrix)', async () => {
+    const res = await request(app).post('/api/auth/logout');
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBeDefined();
+  });
+
+  // NFR-03: Expired session handling & cleanup
+  it('NFR-03: Expired session returns 401 on /api/auth/me and is cleaned up from PostgreSQL', async () => {
+    // 1. Clean existing sessions and log in to get signed session cookie
+    await prisma.session.deleteMany();
+
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: testUserEmail, password: testUserPassword });
+    expect(loginRes.status).toBe(200);
+
+    const cookies = loginRes.headers['set-cookie'];
+    const sessionCookie = cookies.find((c: string) => c.startsWith('pocket48_session='));
+
+    // 2. Artificially expire the session in PostgreSQL
+    const activeSessions = await prisma.session.findMany({
+      where: { user: { email: testUserEmail } },
+    });
+    expect(activeSessions.length).toBe(1);
+    const targetSession = activeSessions[0];
+
+    await prisma.session.update({
+      where: { id: targetSession.id },
+      data: { expiresAt: new Date(Date.now() - 5000) }, // Expired 5 seconds ago
+    });
+
+    // 3. Requesting /me with expired session must return 401
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', [sessionCookie]);
+
+    expect(meRes.status).toBe(401);
+    expect(meRes.body.error).toBeDefined();
+
+    // 4. Verify session was cleaned up from DB
+    const deletedSession = await prisma.session.findUnique({
+      where: { id: targetSession.id },
+    });
+    expect(deletedSession).toBeNull();
   });
 
   // TEST-03 & TEST-14: Logout & Role Integrity

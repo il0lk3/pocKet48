@@ -21,7 +21,8 @@ declare global {
 
 // Session resolution middleware
 export async function authenticateSession(req: Request, _res: Response, next: NextFunction) {
-  const sessionId = req.cookies?.pocket48_session;
+  // Read signed cookie first (with fallback to standard cookie)
+  const sessionId = req.signedCookies?.pocket48_session || req.cookies?.pocket48_session;
   if (!sessionId || typeof sessionId !== 'string') {
     return next();
   }
@@ -36,7 +37,7 @@ export async function authenticateSession(req: Request, _res: Response, next: Ne
       return next();
     }
 
-    // Check expiration (8 hours)
+    // Check expiration (8 hours) - cleanup expired session record (NFR-03)
     if (session.expiresAt < new Date()) {
       await prisma.session.delete({ where: { id: sessionId } }).catch(() => {});
       return next();

@@ -15,7 +15,10 @@ import { authenticateSession } from './middleware/auth';
 export const app = express();
 
 app.use(express.json());
-app.use(cookieParser());
+
+// Signed cookies using SESSION_SECRET from environment (SDS Section 4.1)
+const sessionSecret = process.env.SESSION_SECRET || 'dev-pocket48-session-secret-at-least-32-chars';
+app.use(cookieParser(sessionSecret));
 
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 app.use(
@@ -25,7 +28,7 @@ app.use(
   })
 );
 
-// Session resolution middleware (populates req.user from cookie if valid)
+// Session resolution middleware (populates req.user from signed cookie if valid)
 app.use(authenticateSession);
 
 // Mount API routes

@@ -53,10 +53,12 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       },
     });
 
+    // Signed HTTP-only cookie using SESSION_SECRET
     res.cookie('pocket48_session', session.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      signed: true,
       maxAge: 8 * 60 * 60 * 1000,
       path: '/',
     });
@@ -79,9 +81,9 @@ authRouter.post('/login', async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/auth/logout
-authRouter.post('/logout', async (req: Request, res: Response) => {
-  const sessionId = req.cookies?.pocket48_session;
+// POST /api/auth/logout (guarded by requireAuth per system-sds.md Section 3.3)
+authRouter.post('/logout', requireAuth, async (req: Request, res: Response) => {
+  const sessionId = req.sessionId || req.signedCookies?.pocket48_session || req.cookies?.pocket48_session;
 
   if (sessionId && typeof sessionId === 'string') {
     try {
