@@ -3,6 +3,12 @@ import request from 'supertest';
 import bcrypt from 'bcryptjs';
 import { app } from '../app';
 import { prisma } from '../db';
+import {
+  validateAmount,
+  validateCategoryMatch,
+  validateTransactionDate,
+  validateNote,
+} from '../utils/transactionValidation';
 
 describe('F-02: Record a Transaction Contracts & Business Rules (TDD)', () => {
   const userEmail = 'tx_test_user@pocket48.local';
@@ -370,5 +376,82 @@ describe('F-02: Record a Transaction Contracts & Business Rules (TDD)', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+});
+
+describe('Domain Unit Tests: transactionValidation (BR-01, BR-02, BR-03 with fixed clock)', () => {
+  it('TEST-05 (BR-01 Unit): validateAmount checks exact boundaries and decimal restrictions', () => {
+    expect(validateAmount(0).valid).toBe(false);
+    expect(validateAmount(-10).valid).toBe(false);
+    expect(validateAmount(-0.01).valid).toBe(false);
+    expect(validateAmount(0.001).valid).toBe(false);
+    expect(validateAmount(12.345).valid).toBe(false);
+    expect(validateAmount(10000000).valid).toBe(false);
+    expect(validateAmount(NaN).valid).toBe(false);
+    expect(validateAmount('50').valid).toBe(false);
+
+    // Valid lower boundary: 0.01 THB (1 satang)
+    const minResult = validateAmount(0.01);
+    expect(minResult.valid).toBe(true);
+    expect(minResult.value?.amountSatang).toBe(1n);
+    expect(minResult.value?.amountFormatted).toBe(0.01);
+
+    // Valid upper boundary: 9,999,999.99 THB (999,999,999 satang)
+    const maxResult = validateAmount(9999999.99);
+    expect(maxResult.valid).toBe(true);
+    expect(maxResult.value?.amountSatang).toBe(999999999n);
+    expect(maxResult.value?.amountFormatted).toBe(9999999.99);
+
+    // Standard valid amount: 120.50 THB (12050 satang)
+    const stdResult = validateAmount(120.50);
+    expect(stdResult.valid).toBe(true);
+    expect(stdResult.value?.amountSatang).toBe(12050n);
+    expect(stdResult.value?.amountFormatted).toBe(120.5);
+  });
+
+  it('TEST-06 (BR-02 Unit): validateCategoryMatch verifies type agreement and active status', () => {
+    // Null / missing category
+    expect(validateCategoryMatch('EXPENSE', null).valid).toBe(false);
+
+    // Deactivated category
+    expect(validateCategoryMatch('EXPENSE', { id: 'c1', type: 'EXPENSE', isActive: false }).valid).toBe(false);
+
+    // Type mismatch
+    expect(validateCategoryMatch('EXPENSE', { id: 'c2', type: 'INCOME', isActive: true }).valid).toBe(false);
+    expect(validateCategoryMatch('INCOME', { id: 'c3', type: 'EXPENSE', isActive: true }).valid).toBe(false);
+
+    // Valid match
+    expect(validateCategoryMatch('EXPENSE', { id: 'c4', type: 'EXPENSE', isActive: true }).valid).toBe(true);
+    expect(validateCategoryMatch('INCOME', { id: 'c5', type: 'INCOME', isActive: true }).valid).toBe(true);
+  });
+
+  it('TEST-07 (BR-03 Unit): validateTransactionDate enforces fixed-clock Asia/Bangkok midnight boundary', () => {
+    // Fixed clock at 2026-11-14 20:30:00 UTC
+    // In Asia/Bangkok (UTC+7), this is 2026-11-15 03:30:00 AM (already the next day in Thailand)
+    const fixedClock = new Date('2026-11-14T20:30:00.000Z');
+
+    // 2026-11-15 is today in Asia/Bangkok -> Accepted
+    expect(validateTransactionDate('2026-11-15', fixedClock).valid).toBe(true);
+
+    // 2026-11-14 is yesterday in Asia/Bangkok -> Accepted
+    expect(validateTransactionDate('2026-11-14', fixedClock).valid).toBe(true);
+
+    // 2026-11-16 is tomorrow in Asia/Bangkok -> Rejected
+    const futureResult = validateTransactionDate('2026-11-16', fixedClock);
+    expect(futureResult.valid).toBe(false);
+    expect(futureResult.error).toContain('cannot be later than today');
+
+    // Invalid format
+    expect(validateTransactionDate('invalid-date', fixedClock).valid).toBe(false);
+    expect(validateTransactionDate('2026-02-30', fixedClock).valid).toBe(false);
+  });
+
+  it('validateNote checks length restriction', () => {
+    expect(validateNote(null).valid).toBe(true);
+    expect(validateNote(undefined).valid).toBe(true);
+    expect(validateNote('').valid).toBe(true);
+    expect(validateNote('Valid note').valid).toBe(true);
+    expect(validateNote('A'.repeat(200)).valid).toBe(true);
+    expect(validateNote('A'.repeat(201)).valid).toBe(false);
   });
 });
