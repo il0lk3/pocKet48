@@ -1,6 +1,6 @@
 # Sprint 1 Engineering Contracts: Pocket48
 
-Version 1.1 (BASELINE). Sprint: 1. Target Checkpoint: Deliverable 1 (8 Nov 2026).  
+Version 1.2. Sprint: 1. Target Checkpoint: Deliverable 1 (8 Nov 2026).  
 Project: Pocket48 — Personal Money and Expense Logging System.
 
 ---
@@ -12,6 +12,7 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 | 0.1 | 10 Nov 2026 | Team | Initial draft contracts | Initial project baseline | Commit `670a09b` |
 | 1.0 | 14 Nov 2026 | @il0lk3 / @Achikan | Added revision history, completed 1:1 AC-to-STS mappings (TEST-01 to TEST-18), documented known limitations | Issue #3 review before coding | PR #25 (`b3372c3`) |
 | 1.1 | 14 Nov 2026 | @il0lk3 / @Achikan | Added AC-04-04 & TEST-19 for FR-07 (list active categories); added explicit UI Behavior and Data/Schema layer specs for F-01 to F-06; documented deploy test stubs safety fix | Address peer review feedback (#pullrequestreview-5903268670, Rubric 3.2 & 3.5) | PR #25 |
+| 1.2 | 15 Nov 2026 | @il0lk3 / @Achikan | Documented Pocket48 Pastel Idol Theme UI/UX enhancements (F-01 password visibility toggle & brand highlight, F-02 interactive Grand Calendar Picker, F-03 custom 3D wallet empty state & KPI summary cards, and Ambiance Switcher) | UI/UX polish & sprint design system alignment | PR #34 |
 
 ---
 
@@ -22,9 +23,11 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 * **Description:** Provides password-based login for seeded accounts, creates an 8-hour database-backed session, returns current user information, and terminates the session upon logout.
 * **UI Behavior:**
   * Login view at `/login` provides email and password inputs and a submit button. No default password or role selector is shown.
+  * Password field includes an accessible show/hide visibility toggle button (SVG eye/eye-off vector icons) for client-side password verification without submitting.
+  * Brand title features signature Japanese 48-group violet-to-pink gradient highlight on "48" (`Pocket48`) with soft stage halo glow.
   * Successful login redirects User to `/transactions` and Administrator to `/admin/categories`.
   * Failed login displays an inline generic error banner: `"Invalid email or password"`.
-  * Top navigation bar displays current user's `displayName`, role badge, and a "Sign Out" button. Clicking Sign Out clears state and redirects to `/login`.
+  * Top navigation bar displays current user's `displayName`, role badge, interactive Ambiance Switcher, and a "Sign Out" button. Clicking Sign Out clears state and redirects to `/login`.
 * **API Specification:**
   * `POST /api/auth/login`: `{ "email": "user1@pocket48.local", "password": "..." }` $\to$ Returns `{ "data": { "id": "...", "email": "...", "displayName": "...", "role": "USER" } }` & sets HTTP-only session cookie `pocket48_session`.
   * `POST /api/auth/logout`: Clears session cookie and deletes session record in PostgreSQL $\to$ Returns `{ "data": { "message": "Logged out successfully" } }`.
@@ -47,6 +50,7 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 * **UI Behavior:**
   * "New Transaction" modal / page at `/transactions/new` (accessible to User role).
   * Form controls: Type toggle (`EXPENSE` default / `INCOME`), Category select dropdown (filtered by selected Type, showing only active categories), Amount input (decimal, max 2 decimals, step `0.01`), Transaction Date picker (default today, max date = today in Asia/Bangkok), and Note textarea (optional, max 200 chars).
+  * Transaction Date picker is powered by an interactive oversized `GrandCalendarPicker` with English month navigation (`November 2026`), weekday headers (`Sun`..`Sat`), quick shortcut chips (`Today`, `Yesterday`), and visually disabled future dates enforcing BR-03 at the UI interaction level.
   * Client-side validation provides instant feedback preventing submission of negative/zero amounts, future dates, or empty categories.
   * On submit success, modal closes, toast notification confirms creation, and transactions table refreshes.
 * **API Specification:**
@@ -80,8 +84,9 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 * **UI Behavior:**
   * Transactions view at `/transactions` (accessible to User role).
   * Displays a chronological list/table of own transactions ordered descending by date.
+  * Summary KPI cards display Total Income (CGM48 Mint highlight), Total Expense (AKB48 Pink highlight), and Net Balance (BNK48 Violet highlight).
   * Columns: Date (`YYYY-MM-DD`), Type (color-coded badge: Green for Income, Red for Expense), Category name, Note, and Amount (formatted in THB with 2 decimal places, e.g., `฿120.50`).
-  * Empty state: Friendly message (`"No transactions recorded yet. Click 'Record Transaction' to start."`) when list is empty.
+  * Empty state: Friendly message (`"No transactions recorded yet. Click 'Record Transaction' to start."`) accompanied by a custom 3D pastel wallet illustration embossed with sakura blossom when list is empty.
 * **API Specification:**
   * `GET /api/transactions`
   * Response: HTTP 200 OK with `{ "data": [ { "id": "...", "amount": 120.50, "amountSatang": 12050, "type": "EXPENSE", "transactionDate": "2026-11-10", "category": { "id": "...", "name": "Food & Beverage" }, "note": "Lunch with team" } ] }`.
