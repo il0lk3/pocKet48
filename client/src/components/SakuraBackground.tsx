@@ -36,47 +36,68 @@ export const SakuraBackground: React.FC = () => {
       {/* Mode: SAKURA (Grand, Extravagant Japanese Cherry Blossom Canopies) */}
       {mode === 'sakura' && (
         <>
-          {/* Top-Left Grand Extravagant Sakura Canopy */}
+          {/* Top-Left Grand Extravagant Sakura Canopy: Fully tapered, zero clipping, blossoms at every tip */}
           <div className="sakura-tree-canopy-top-left">
             <svg
-              viewBox="0 0 640 440"
+              viewBox="-40 -30 720 480"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="canopy-svg"
             >
-              {/* Grand Ancient Sakura Boughs */}
+              {/* Grand Ancient Sakura Boughs (Tapered & Layered) */}
+              {/* Main heavy trunk emerging from top-left */}
               <path
-                d="M -30 -20 C 90 40, 190 30, 310 90 C 400 135, 480 145, 590 190 C 620 202, 640 215, 650 225"
-                stroke="#6e4d3b"
-                strokeWidth="13"
+                d="M -30 -20 C 80 35, 180 28, 290 85 C 370 125, 450 140, 540 175"
+                stroke="#634434"
+                strokeWidth="12"
                 strokeLinecap="round"
-                opacity="0.8"
+                opacity="0.82"
               />
+              {/* Main lateral continuation tapering into terminal cluster at (600, 205) */}
               <path
-                d="M 130 35 C 190 85, 235 150, 315 220 C 370 270, 420 300, 490 350"
-                stroke="#7a5847"
-                strokeWidth="8.5"
+                d="M 540 175 C 565 185, 585 195, 600 205"
+                stroke="#634434"
+                strokeWidth="6"
                 strokeLinecap="round"
                 opacity="0.75"
               />
+              {/* Secondary downward cascading bough tapering to (470, 335) */}
               <path
-                d="M 280 85 C 360 65, 430 75, 510 55 C 550 45, 590 50, 620 40"
-                stroke="#7a5847"
-                strokeWidth="6"
+                d="M 130 35 C 185 85, 230 145, 305 215 C 360 265, 405 295, 470 335"
+                stroke="#704e3b"
+                strokeWidth="8"
+                strokeLinecap="round"
+                opacity="0.75"
+              />
+              {/* Downward terminal twig ending at (475, 340) */}
+              <path
+                d="M 470 335 C 472 337, 474 338, 475 340"
+                stroke="#704e3b"
+                strokeWidth="4"
                 strokeLinecap="round"
                 opacity="0.7"
               />
+              {/* Upper lateral bough arching to (580, 45) */}
               <path
-                d="M 220 130 C 265 175, 305 210, 360 260 C 400 295, 435 320, 470 340"
+                d="M 270 80 C 350 62, 420 72, 495 55 C 530 46, 555 48, 580 45"
+                stroke="#704e3b"
+                strokeWidth="5.5"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+              {/* Lower inner sprig tapering to (340, 245) */}
+              <path
+                d="M 215 125 C 255 165, 290 195, 340 245"
                 stroke="#7a5847"
-                strokeWidth="4.5"
+                strokeWidth="4"
                 strokeLinecap="round"
                 opacity="0.65"
               />
+              {/* Lateral outer sprig tapering to (560, 210) */}
               <path
-                d="M 440 120 C 490 160, 540 185, 590 220"
+                d="M 425 120 C 475 155, 520 180, 560 210"
                 stroke="#7a5847"
-                strokeWidth="4"
+                strokeWidth="3.5"
                 strokeLinecap="round"
                 opacity="0.6"
               />
@@ -91,68 +112,83 @@ export const SakuraBackground: React.FC = () => {
               <circle cx="95" cy="110" r="24" fill="#ffd6e3" opacity="0.88" />
 
               {/* 2. Mid-Bough Extravagant Cluster */}
-              <circle cx="230" cy="100" r="54" fill="#fda4bc" opacity="0.5" filter="blur(18px)" />
-              <circle cx="215" cy="85" r="36" fill="#ffd6e3" opacity="0.92" />
-              <circle cx="260" cy="115" r="32" fill="#f472b6" opacity="0.82" />
-              <circle cx="185" cy="105" r="28" fill="#ffffff" opacity="0.95" />
-              <circle cx="275" cy="85" r="24" fill="#fca5bc" opacity="0.88" />
-              <circle cx="305" cy="110" r="20" fill="#ffd6e3" opacity="0.9" />
-              <circle cx="240" cy="140" r="26" fill="#ffd6e3" opacity="0.85" />
+              <circle cx="230" cy="95" r="54" fill="#fda4bc" opacity="0.5" filter="blur(18px)" />
+              <circle cx="215" cy="80" r="36" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="260" cy="110" r="32" fill="#f472b6" opacity="0.82" />
+              <circle cx="185" cy="100" r="28" fill="#ffffff" opacity="0.95" />
+              <circle cx="275" cy="80" r="24" fill="#fca5bc" opacity="0.88" />
+              <circle cx="305" cy="105" r="20" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="240" cy="135" r="26" fill="#ffd6e3" opacity="0.85" />
 
-              {/* 3. Lower Cascading Bough Cluster */}
+              {/* 3. Lower Cascading Bough Cluster (Enveloping terminal tip at 475, 340) */}
               <circle cx="330" cy="225" r="46" fill="#fda4bc" opacity="0.45" filter="blur(16px)" />
               <circle cx="310" cy="205" r="32" fill="#ffd6e3" opacity="0.9" />
               <circle cx="355" cy="240" r="28" fill="#f472b6" opacity="0.82" />
               <circle cx="370" cy="200" r="22" fill="#ffffff" opacity="0.92" />
-              <circle cx="435" cy="305" r="28" fill="#ffd6e3" opacity="0.88" />
-              <circle cx="460" cy="325" r="22" fill="#f472b6" opacity="0.82" />
-              <circle cx="485" cy="355" r="18" fill="#ffffff" opacity="0.95" />
+              <circle cx="430" cy="300" r="30" fill="#ffd6e3" opacity="0.88" />
+              <circle cx="455" cy="325" r="26" fill="#f472b6" opacity="0.85" />
+              {/* Terminal Blossom Cap at (475, 340) */}
+              <circle cx="475" cy="340" r="26" fill="#ffd6e3" opacity="0.95" />
+              <circle cx="475" cy="340" r="18" fill="#ffffff" opacity="0.95" />
+              <circle cx="475" cy="340" r="8" fill="#f43f5e" opacity="0.8" />
+              <circle cx="498" cy="355" r="16" fill="#fda4bc" opacity="0.85" />
 
-              {/* 4. Upper Outstretching Bough Cluster */}
-              <circle cx="460" cy="75" r="42" fill="#fda4bc" opacity="0.45" filter="blur(14px)" />
-              <circle cx="445" cy="68" r="28" fill="#ffd6e3" opacity="0.92" />
-              <circle cx="485" cy="88" r="24" fill="#f472b6" opacity="0.82" />
-              <circle cx="525" cy="60" r="22" fill="#ffd6e3" opacity="0.88" />
-              <circle cx="555" cy="55" r="16" fill="#ffffff" opacity="0.95" />
-              <circle cx="610" cy="45" r="14" fill="#ffd6e3" opacity="0.9" />
+              {/* 4. Upper Outstretching Bough Cluster (Enveloping terminal tip at 580, 45) */}
+              <circle cx="450" cy="70" r="42" fill="#fda4bc" opacity="0.45" filter="blur(14px)" />
+              <circle cx="435" cy="62" r="28" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="475" cy="82" r="24" fill="#f472b6" opacity="0.82" />
+              <circle cx="515" cy="55" r="22" fill="#ffd6e3" opacity="0.88" />
+              <circle cx="545" cy="50" r="20" fill="#ffffff" opacity="0.95" />
+              {/* Terminal Blossom Cap at (580, 45) */}
+              <circle cx="580" cy="45" r="24" fill="#ffd6e3" opacity="0.95" />
+              <circle cx="580" cy="45" r="16" fill="#f472b6" opacity="0.85" />
+              <circle cx="580" cy="45" r="7" fill="#ffffff" opacity="0.95" />
+              <circle cx="600" cy="42" r="14" fill="#fda4bc" opacity="0.85" />
 
-              {/* 5. Lateral Outreaching Bough Cluster */}
-              <circle cx="530" cy="180" r="44" fill="#fda4bc" opacity="0.45" filter="blur(14px)" />
-              <circle cx="515" cy="170" r="28" fill="#ffd6e3" opacity="0.92" />
-              <circle cx="550" cy="195" r="24" fill="#f472b6" opacity="0.82" />
-              <circle cx="585" cy="205" r="20" fill="#ffd6e3" opacity="0.9" />
-              <circle cx="615" cy="225" r="16" fill="#ffffff" opacity="0.95" />
+              {/* 5. Lateral Outreaching Bough Cluster (Enveloping terminal tip at 600, 205) */}
+              <circle cx="520" cy="175" r="44" fill="#fda4bc" opacity="0.45" filter="blur(14px)" />
+              <circle cx="505" cy="165" r="28" fill="#ffd6e3" opacity="0.92" />
+              <circle cx="540" cy="190" r="24" fill="#f472b6" opacity="0.82" />
+              <circle cx="570" cy="200" r="26" fill="#ffd6e3" opacity="0.92" />
+              {/* Terminal Blossom Cap at (600, 205) — solves Image 1 cut! */}
+              <circle cx="600" cy="205" r="28" fill="#fda4bc" opacity="0.5" filter="blur(8px)" />
+              <circle cx="600" cy="205" r="26" fill="#ffd6e3" opacity="0.95" />
+              <circle cx="600" cy="205" r="18" fill="#f472b6" opacity="0.88" />
+              <circle cx="600" cy="205" r="9" fill="#ffffff" opacity="0.95" />
+              <circle cx="625" cy="212" r="16" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="638" cy="220" r="11" fill="#ffffff" opacity="0.95" />
             </svg>
           </div>
 
-          {/* Top-Right Counter-Balancing Sakura Canopy */}
+          {/* Top-Right Counter-Balancing Sakura Canopy: Fully tapered, zero clipping, blossoms at tips */}
           <div className="sakura-tree-canopy-top-right">
             <svg
-              viewBox="0 0 420 320"
+              viewBox="-30 -30 480 360"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="canopy-svg"
             >
+              {/* Tapered boughs from upper-right toward center */}
               <path
-                d="M 440 -15 C 340 35, 260 50, 160 85 C 105 105, 50 130, 10 160"
-                stroke="#6e4d3b"
-                strokeWidth="9"
+                d="M 430 -10 C 330 35, 255 50, 160 85 C 110 105, 70 125, 35 150"
+                stroke="#634434"
+                strokeWidth="8.5"
                 strokeLinecap="round"
                 opacity="0.75"
               />
               <path
-                d="M 280 45 C 210 95, 170 135, 100 185 C 65 210, 35 235, 15 255"
-                stroke="#7a5847"
-                strokeWidth="5.5"
+                d="M 35 150 C 25 156, 18 162, 15 168"
+                stroke="#634434"
+                strokeWidth="4"
                 strokeLinecap="round"
-                opacity="0.7"
+                opacity="0.65"
               />
               <path
-                d="M 210 75 C 170 115, 140 145, 90 180"
-                stroke="#7a5847"
-                strokeWidth="3.5"
+                d="M 270 45 C 200 95, 160 135, 95 185 C 65 210, 42 230, 25 248"
+                stroke="#704e3b"
+                strokeWidth="5"
                 strokeLinecap="round"
-                opacity="0.6"
+                opacity="0.7"
               />
 
               {/* Blossom clusters right corner */}
@@ -162,10 +198,19 @@ export const SakuraBackground: React.FC = () => {
               <circle cx="230" cy="70" r="32" fill="#ffd6e3" opacity="0.9" />
               <circle cx="190" cy="80" r="24" fill="#ffffff" opacity="0.92" />
               <circle cx="150" cy="95" r="22" fill="#fca5bc" opacity="0.85" />
-              <circle cx="115" cy="155" r="28" fill="#ffd6e3" opacity="0.9" />
-              <circle cx="85" cy="180" r="22" fill="#f472b6" opacity="0.82" />
-              <circle cx="55" cy="205" r="18" fill="#ffffff" opacity="0.95" />
-              <circle cx="25" cy="245" r="16" fill="#ffd6e3" opacity="0.88" />
+              <circle cx="105" cy="155" r="28" fill="#ffd6e3" opacity="0.9" />
+              <circle cx="75" cy="175" r="22" fill="#f472b6" opacity="0.82" />
+
+              {/* Terminal Blossom Cap at (15, 168) */}
+              <circle cx="15" cy="168" r="24" fill="#ffd6e3" opacity="0.95" />
+              <circle cx="15" cy="168" r="16" fill="#f472b6" opacity="0.85" />
+              <circle cx="15" cy="168" r="7" fill="#ffffff" opacity="0.95" />
+              <circle cx="-2" cy="175" r="13" fill="#ffd6e3" opacity="0.88" />
+
+              {/* Terminal Blossom Cap at (25, 248) */}
+              <circle cx="25" cy="248" r="22" fill="#ffd6e3" opacity="0.95" />
+              <circle cx="25" cy="248" r="14" fill="#ffffff" opacity="0.95" />
+              <circle cx="25" cy="248" r="6" fill="#f43f5e" opacity="0.85" />
             </svg>
           </div>
         </>
@@ -174,39 +219,53 @@ export const SakuraBackground: React.FC = () => {
       {/* Mode: MINT (Grand, Extravagant CGM48 Fresh Mint Garden Canopies) */}
       {mode === 'mint' && (
         <>
-          {/* Top-Left Grand Extravagant Mint Canopy */}
+          {/* Top-Left Grand Extravagant Mint Canopy: Fully tapered, zero clipping, mint clusters at tips */}
           <div className="mint-tree-canopy-top-left">
             <svg
-              viewBox="0 0 640 440"
+              viewBox="-40 -30 720 480"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="canopy-svg"
             >
-              {/* Graceful Forest Green Botanical Branches */}
+              {/* Graceful Forest Green Botanical Branches (Tapered & Layered) */}
               <path
-                d="M -30 -20 C 80 40, 180 30, 290 85 C 380 130, 460 140, 570 185 C 605 198, 630 210, 645 220"
-                stroke="#325340"
+                d="M -30 -20 C 80 35, 180 28, 290 85 C 370 125, 450 140, 540 175"
+                stroke="#2d4f3b"
                 strokeWidth="12"
                 strokeLinecap="round"
-                opacity="0.8"
+                opacity="0.82"
               />
               <path
-                d="M 125 35 C 185 85, 230 145, 305 215 C 360 265, 410 295, 480 345"
-                stroke="#406952"
+                d="M 540 175 C 565 185, 585 195, 600 205"
+                stroke="#375d46"
+                strokeWidth="6"
+                strokeLinecap="round"
+                opacity="0.75"
+              />
+              <path
+                d="M 125 35 C 180 85, 225 145, 300 215 C 355 265, 400 295, 465 335"
+                stroke="#375d46"
                 strokeWidth="8"
                 strokeLinecap="round"
                 opacity="0.75"
               />
               <path
-                d="M 270 80 C 350 60, 420 70, 500 50 C 540 40, 580 45, 610 35"
-                stroke="#406952"
+                d="M 465 335 C 468 337, 470 339, 472 340"
+                stroke="#375d46"
+                strokeWidth="4"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+              <path
+                d="M 270 80 C 350 62, 420 72, 495 55 C 530 46, 555 48, 580 45"
+                stroke="#375d46"
                 strokeWidth="5.5"
                 strokeLinecap="round"
                 opacity="0.7"
               />
               <path
-                d="M 210 125 C 255 170, 295 205, 350 255 C 390 290, 425 315, 460 335"
-                stroke="#4a7a5f"
+                d="M 210 125 C 250 165, 285 195, 335 245"
+                stroke="#446e53"
                 strokeWidth="4"
                 strokeLinecap="round"
                 opacity="0.65"
@@ -230,60 +289,74 @@ export const SakuraBackground: React.FC = () => {
               <circle cx="305" cy="105" r="22" fill="#10b981" opacity="0.8" />
               <circle cx="240" cy="135" r="26" fill="#86efac" opacity="0.88" />
 
-              {/* 3. Lower Cascading Foliage Cluster */}
+              {/* 3. Lower Cascading Foliage Cluster (Enveloping terminal tip at 472, 340) */}
               <circle cx="325" cy="220" r="46" fill="#a7f3d0" opacity="0.45" filter="blur(16px)" />
               <circle cx="305" cy="200" r="32" fill="#dcfce9" opacity="0.9" />
               <circle cx="350" cy="235" r="28" fill="#34d399" opacity="0.85" />
               <circle cx="365" cy="195" r="24" fill="#ffffff" opacity="0.92" />
               <circle cx="430" cy="300" r="28" fill="#6ee7b7" opacity="0.88" />
-              <circle cx="455" cy="320" r="22" fill="#10b981" opacity="0.8" />
-              <circle cx="480" cy="350" r="18" fill="#dcfce9" opacity="0.95" />
+              <circle cx="455" cy="320" r="24" fill="#10b981" opacity="0.82" />
+              {/* Terminal Mint Leaf Cap at (472, 340) */}
+              <circle cx="472" cy="340" r="26" fill="#dcfce9" opacity="0.95" />
+              <circle cx="472" cy="340" r="18" fill="#34d399" opacity="0.9" />
+              <circle cx="472" cy="340" r="8" fill="#ffffff" opacity="0.95" />
+              <circle cx="495" cy="355" r="16" fill="#86efac" opacity="0.88" />
 
-              {/* 4. Upper Outstretching Mint Sprigs */}
+              {/* 4. Upper Outstretching Mint Sprigs (Enveloping terminal tip at 580, 45) */}
               <circle cx="450" cy="70" r="42" fill="#a7f3d0" opacity="0.45" filter="blur(14px)" />
               <circle cx="435" cy="62" r="28" fill="#dcfce9" opacity="0.92" />
               <circle cx="475" cy="82" r="24" fill="#34d399" opacity="0.85" />
               <circle cx="515" cy="55" r="22" fill="#86efac" opacity="0.88" />
-              <circle cx="545" cy="50" r="16" fill="#ffffff" opacity="0.95" />
-              <circle cx="600" cy="40" r="15" fill="#6ee7b7" opacity="0.9" />
+              <circle cx="545" cy="50" r="20" fill="#ffffff" opacity="0.95" />
+              {/* Terminal Mint Leaf Cap at (580, 45) */}
+              <circle cx="580" cy="45" r="24" fill="#dcfce9" opacity="0.95" />
+              <circle cx="580" cy="45" r="16" fill="#34d399" opacity="0.88" />
+              <circle cx="580" cy="45" r="7" fill="#ffffff" opacity="0.95" />
+              <circle cx="600" cy="42" r="14" fill="#6ee7b7" opacity="0.85" />
 
-              {/* 5. Lateral Outreaching Tips */}
+              {/* 5. Lateral Outreaching Tips (Enveloping terminal tip at 600, 205) */}
               <circle cx="520" cy="175" r="44" fill="#a7f3d0" opacity="0.45" filter="blur(14px)" />
               <circle cx="505" cy="165" r="28" fill="#dcfce9" opacity="0.92" />
               <circle cx="540" cy="190" r="24" fill="#34d399" opacity="0.85" />
-              <circle cx="575" cy="200" r="20" fill="#86efac" opacity="0.9" />
-              <circle cx="605" cy="220" r="16" fill="#ffffff" opacity="0.95" />
+              <circle cx="570" cy="200" r="26" fill="#86efac" opacity="0.9" />
+              {/* Terminal Mint Leaf Cap at (600, 205) */}
+              <circle cx="600" cy="205" r="28" fill="#a7f3d0" opacity="0.5" filter="blur(8px)" />
+              <circle cx="600" cy="205" r="26" fill="#dcfce9" opacity="0.95" />
+              <circle cx="600" cy="205" r="18" fill="#34d399" opacity="0.88" />
+              <circle cx="600" cy="205" r="8" fill="#ffffff" opacity="0.95" />
+              <circle cx="625" cy="212" r="16" fill="#86efac" opacity="0.9" />
+              <circle cx="638" cy="220" r="11" fill="#ffffff" opacity="0.95" />
             </svg>
           </div>
 
-          {/* Top-Right Counter-Balancing Mint Canopy */}
+          {/* Top-Right Counter-Balancing Mint Canopy: Fully tapered, zero clipping */}
           <div className="mint-tree-canopy-top-right">
             <svg
-              viewBox="0 0 420 320"
+              viewBox="-30 -30 480 360"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="canopy-svg"
             >
               <path
-                d="M 440 -15 C 340 35, 260 50, 160 85 C 105 105, 50 130, 10 160"
-                stroke="#325340"
-                strokeWidth="9"
+                d="M 430 -10 C 330 35, 255 50, 160 85 C 110 105, 70 125, 35 150"
+                stroke="#2d4f3b"
+                strokeWidth="8.5"
                 strokeLinecap="round"
                 opacity="0.75"
               />
               <path
-                d="M 280 45 C 210 95, 170 135, 100 185 C 65 210, 35 235, 15 255"
-                stroke="#406952"
-                strokeWidth="5.5"
+                d="M 35 150 C 25 156, 18 162, 15 168"
+                stroke="#375d46"
+                strokeWidth="4"
                 strokeLinecap="round"
-                opacity="0.7"
+                opacity="0.65"
               />
               <path
-                d="M 210 75 C 170 115, 140 145, 90 180"
-                stroke="#4a7a5f"
-                strokeWidth="3.5"
+                d="M 270 45 C 200 95, 160 135, 95 185 C 65 210, 42 230, 25 248"
+                stroke="#375d46"
+                strokeWidth="5"
                 strokeLinecap="round"
-                opacity="0.6"
+                opacity="0.7"
               />
 
               {/* Foliage clusters right corner */}
@@ -293,10 +366,19 @@ export const SakuraBackground: React.FC = () => {
               <circle cx="230" cy="70" r="32" fill="#86efac" opacity="0.9" />
               <circle cx="190" cy="80" r="24" fill="#ffffff" opacity="0.92" />
               <circle cx="150" cy="95" r="22" fill="#6ee7b7" opacity="0.88" />
-              <circle cx="115" cy="155" r="28" fill="#dcfce9" opacity="0.92" />
-              <circle cx="85" cy="180" r="22" fill="#34d399" opacity="0.85" />
-              <circle cx="55" cy="205" r="18" fill="#ffffff" opacity="0.95" />
-              <circle cx="25" cy="245" r="16" fill="#86efac" opacity="0.9" />
+              <circle cx="105" cy="155" r="28" fill="#dcfce9" opacity="0.92" />
+              <circle cx="75" cy="175" r="22" fill="#34d399" opacity="0.85" />
+
+              {/* Terminal Mint Cap at (15, 168) */}
+              <circle cx="15" cy="168" r="24" fill="#dcfce9" opacity="0.95" />
+              <circle cx="15" cy="168" r="16" fill="#34d399" opacity="0.88" />
+              <circle cx="15" cy="168" r="7" fill="#ffffff" opacity="0.95" />
+              <circle cx="-2" cy="175" r="13" fill="#86efac" opacity="0.88" />
+
+              {/* Terminal Mint Cap at (25, 248) */}
+              <circle cx="25" cy="248" r="22" fill="#dcfce9" opacity="0.95" />
+              <circle cx="25" cy="248" r="14" fill="#34d399" opacity="0.9" />
+              <circle cx="25" cy="248" r="6" fill="#ffffff" opacity="0.95" />
             </svg>
           </div>
         </>

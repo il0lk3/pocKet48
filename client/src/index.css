@@ -149,6 +149,7 @@ html, body {
   width: 100%;
   height: auto;
   display: block;
+  overflow: visible !important;
 }
 
 /* Soft Stage Dual Spotlights Beaming Down */
