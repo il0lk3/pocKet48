@@ -73,7 +73,7 @@ if [ "${1:-} ${2:-} ${3:-}" = 'sql users list' ]; then
   if [ "$STUB_MODE" = first_run ]; then
     echo postgres
   else
-    printf 'postgres\ntoktickit\n'
+    printf 'postgres\npocket48\n'
   fi
   exit 0
 fi
@@ -82,7 +82,7 @@ for word in "$@"; do
     case "$STUB_MODE" in
       first_run) exit 1 ;;
       partial)
-        if [ "${1:-} ${3:-}" = 'secrets toktickit-database-url' ]; then
+        if [ "${1:-} ${3:-}" = 'secrets pocket48-database-url' ]; then
           exit 1
         fi ;;
     esac
@@ -104,7 +104,11 @@ for MODE in first_run rerun partial job-fail demo; do
   args=()
   if [ "$MODE" = demo ]; then args+=(--demo); fi
   result=0
-  bash "$DEPLOY_SCRIPT" "${args[@]}" > "$TEST_STATE_DIR/output" 2>&1 || result=$?
+  if [ ${#args[@]} -gt 0 ]; then
+    bash "$DEPLOY_SCRIPT" "${args[@]}" > "$TEST_STATE_DIR/output" 2>&1 || result=$?
+  else
+    bash "$DEPLOY_SCRIPT" > "$TEST_STATE_DIR/output" 2>&1 || result=$?
+  fi
   expected=0
   if [ "$MODE" = job-fail ]; then expected=1; fi
   if [ "$result" -ne "$expected" ]; then
@@ -121,12 +125,12 @@ for MODE in first_run rerun partial job-fail demo; do
   if grep -q '^projects add-iam-policy-binding .*roles/secretmanager.secretAccessor' "$GCLOUD_LOG"; then
     echo 'FAIL: runtime has project-wide secret access'; exit 1
   fi
-  for secret in toktickit-database-url toktickit-admin-password; do
+  for secret in pocket48-database-url pocket48-admin-password; do
     grep -q "^secrets add-iam-policy-binding $secret .*roles/secretmanager.secretAccessor" "$GCLOUD_LOG"
   done
   if [ "$MODE" = demo ]; then
-    grep -q '^secrets add-iam-policy-binding toktickit-demo-password ' "$GCLOUD_LOG"
-  elif grep -q '^secrets add-iam-policy-binding toktickit-demo-password ' "$GCLOUD_LOG"; then
+    grep -q '^secrets add-iam-policy-binding pocket48-demo-password ' "$GCLOUD_LOG"
+  elif grep -q '^secrets add-iam-policy-binding pocket48-demo-password ' "$GCLOUD_LOG"; then
     echo 'FAIL: granted optional demo secret in non-demo mode'; exit 1
   fi
   case "$MODE" in
@@ -141,9 +145,9 @@ for MODE in first_run rerun partial job-fail demo; do
   esac
   if [ -f "$TEST_STATE_DIR/sql-pass" ]; then
     db_pass="$(cat "$TEST_STATE_DIR/sql-pass")"
-    db_url="$(cat "$TEST_STATE_DIR/payload-toktickit-database-url")"
+    db_url="$(cat "$TEST_STATE_DIR/payload-pocket48-database-url")"
     case "$db_url" in
-      "postgresql://toktickit:${db_pass}@"*) ;;
+      "postgresql://pocket48:${db_pass}@"*) ;;
       *) echo 'FAIL: DB password differs from secret'; exit 1 ;;
     esac
     if grep -Fq "$db_pass" "$TEST_STATE_DIR/output"; then

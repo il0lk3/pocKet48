@@ -1,7 +1,17 @@
 # Sprint 1 Engineering Contracts: Pocket48
 
-Version 0.1 (DRAFT). Sprint: 1. Target Checkpoint: Deliverable 1 (8 Nov 2026).  
+Version 1.1 (BASELINE). Sprint: 1. Target Checkpoint: Deliverable 1 (8 Nov 2026).  
 Project: Pocket48 — Personal Money and Expense Logging System.
+
+---
+
+## Revision History
+
+| Version | Date | Author / Reviewer | Changes | Reason | PR / Commit |
+|---|---|---|---|---|---|
+| 0.1 | 10 Nov 2026 | Team | Initial draft contracts | Initial project baseline | Commit `670a09b` |
+| 1.0 | 14 Nov 2026 | @il0lk3 / @Achikan | Added revision history, completed 1:1 AC-to-STS mappings (TEST-01 to TEST-18), documented known limitations | Issue #3 review before coding | PR #25 (`b3372c3`) |
+| 1.1 | 14 Nov 2026 | @il0lk3 / @Achikan | Added AC-04-04 & TEST-19 for FR-07 (list active categories); added explicit UI Behavior and Data/Schema layer specs for F-01 to F-06; documented deploy test stubs safety fix | Address peer review feedback (#pullrequestreview-5903268670, Rubric 3.2 & 3.5) | PR #25 |
 
 ---
 
@@ -10,10 +20,19 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 ### F-01: Authentication and Session
 * **Linked Requirements:** FR-01, FR-02, FR-03, NFR-02, NFR-03
 * **Description:** Provides password-based login for seeded accounts, creates an 8-hour database-backed session, returns current user information, and terminates the session upon logout.
+* **UI Behavior:**
+  * Login view at `/login` provides email and password inputs and a submit button. No default password or role selector is shown.
+  * Successful login redirects User to `/transactions` and Administrator to `/admin/categories`.
+  * Failed login displays an inline generic error banner: `"Invalid email or password"`.
+  * Top navigation bar displays current user's `displayName`, role badge, and a "Sign Out" button. Clicking Sign Out clears state and redirects to `/login`.
 * **API Specification:**
-  * `POST /api/auth/login`: `{ "email": "user1@pocket48.local", "password": "..." }` $\to$ Returns user info & sets HTTP-only session cookie.
-  * `POST /api/auth/logout`: Clears session cookie and deletes session record in PostgreSQL.
-  * `GET /api/auth/me`: Returns `{ "data": { "id": "...", "displayName": "...", "role": "USER" } }` based on valid session cookie.
+  * `POST /api/auth/login`: `{ "email": "user1@pocket48.local", "password": "..." }` $\to$ Returns `{ "data": { "id": "...", "email": "...", "displayName": "...", "role": "USER" } }` & sets HTTP-only session cookie `pocket48_session`.
+  * `POST /api/auth/logout`: Clears session cookie and deletes session record in PostgreSQL $\to$ Returns `{ "data": { "message": "Logged out successfully" } }`.
+  * `GET /api/auth/me`: Returns `{ "data": { "id": "...", "email": "...", "displayName": "...", "role": "USER" } }` based on valid session cookie.
+* **Data / Schema Specification:**
+  * Table `users`: `id` (UUID PK), `email` (TEXT UNIQUE), `passwordHash` (TEXT), `displayName` (TEXT), `role` (`Role` enum: `USER` | `ADMINISTRATOR`), `isActive` (BOOLEAN default `true`), `createdAt`, `updatedAt`.
+  * Table `sessions`: `id` (UUID PK / session token hash), `userId` (FK references `users.id` ON DELETE CASCADE), `expiresAt` (TIMESTAMP, UTC), `createdAt` (TIMESTAMP, UTC).
+  * Constraints: `email` unique lowercase index; `sessions.userId` index; passwords stored strictly as salted hashes (`bcrypt`, cost factor 10).
 * **Acceptance Criteria:**
   * **AC-01-01 (Valid Login):** Given an active user with correct credentials, login succeeds (200 OK), sets `pocket48_session` cookie, and returns user profile without password or hash.
   * **AC-01-02 (Invalid Login):** Given incorrect email or wrong password, login fails with HTTP 401 and generic message `"Invalid email or password"`.
@@ -25,6 +44,11 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 ### F-02: Record a Transaction
 * **Linked Requirements:** FR-04, BR-01, BR-02, BR-03
 * **Description:** Allows an authenticated User to record an income or expense transaction with amount (validated and stored as integer satang), transaction date, active matching category, and optional note.
+* **UI Behavior:**
+  * "New Transaction" modal / page at `/transactions/new` (accessible to User role).
+  * Form controls: Type toggle (`EXPENSE` default / `INCOME`), Category select dropdown (filtered by selected Type, showing only active categories), Amount input (decimal, max 2 decimals, step `0.01`), Transaction Date picker (default today, max date = today in Asia/Bangkok), and Note textarea (optional, max 200 chars).
+  * Client-side validation provides instant feedback preventing submission of negative/zero amounts, future dates, or empty categories.
+  * On submit success, modal closes, toast notification confirms creation, and transactions table refreshes.
 * **API Specification:**
   * `POST /api/transactions`
   * Request Body:
@@ -37,7 +61,11 @@ Project: Pocket48 — Personal Money and Expense Logging System.
       "note": "Lunch with team"
     }
     ```
-  * Response: HTTP 201 Created with `{ "data": { "id": "...", "amount": 120.50, "amountSatang": 12050, ... } }`
+  * Response: HTTP 201 Created with `{ "data": { "id": "...", "amount": 120.50, "amountSatang": 12050, "type": "EXPENSE", "transactionDate": "2026-11-10", "categoryId": "...", "note": "Lunch with team", "createdAt": "..." } }`.
+  * Errors: 400 Bad Request with `{ "error": { "code": "VALIDATION_ERROR", "message": "..." } }`.
+* **Data / Schema Specification:**
+  * Table `transactions`: `id` (UUID PK), `userId` (FK references `users.id` ON DELETE CASCADE), `categoryId` (FK references `categories.id` ON DELETE RESTRICT), `type` (`TransactionType` enum: `INCOME` | `EXPENSE`), `amountSatang` (`BigInt` / integer satang $\ge 1$), `transactionDate` (DATE / String `YYYY-MM-DD`), `note` (VARCHAR(200), nullable), `createdAt`, `updatedAt`.
+  * Constraints: Integer satang storage eliminates IEEE 754 floating-point errors (D-03); composite index `[userId, transactionDate DESC]`.
 * **Acceptance Criteria:**
   * **AC-02-01 (Valid Transaction):** When a user submits an expense with a positive amount (e.g. 120.50), active EXPENSE category, and date $\le$ today, it is saved and stored as `12050` satang.
   * **AC-02-02 (Amount Boundary Rejection):** Submitting an amount $\le 0$ or $> 9,999,999.99$ or having $> 2$ decimal places returns HTTP 400 Bad Request.
@@ -49,9 +77,16 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 ### F-03: My Transactions List
 * **Linked Requirements:** FR-05, BR-04
 * **Description:** Retrieves the authenticated user's own transactions ordered by `transactionDate` descending (newest first).
+* **UI Behavior:**
+  * Transactions view at `/transactions` (accessible to User role).
+  * Displays a chronological list/table of own transactions ordered descending by date.
+  * Columns: Date (`YYYY-MM-DD`), Type (color-coded badge: Green for Income, Red for Expense), Category name, Note, and Amount (formatted in THB with 2 decimal places, e.g., `฿120.50`).
+  * Empty state: Friendly message (`"No transactions recorded yet. Click 'Record Transaction' to start."`) when list is empty.
 * **API Specification:**
   * `GET /api/transactions`
-  * Response: HTTP 200 OK with `{ "data": [ { "id": "...", "amount": 120.50, "type": "EXPENSE", ... } ] }`
+  * Response: HTTP 200 OK with `{ "data": [ { "id": "...", "amount": 120.50, "amountSatang": 12050, "type": "EXPENSE", "transactionDate": "2026-11-10", "category": { "id": "...", "name": "Food & Beverage" }, "note": "Lunch with team" } ] }`.
+* **Data / Schema Specification:**
+  * **No new schema changes required:** Reuses existing `transactions`, `categories`, and `users` tables. Queries filter strictly by `WHERE userId = req.user.id ORDER BY transactionDate DESC, createdAt DESC`.
 * **Acceptance Criteria:**
   * **AC-03-01 (List Order):** Transactions are returned in descending order of transaction date.
   * **AC-03-02 (Ownership Isolation):** The returned list contains only transactions belonging to the calling user; no transactions of other users appear.
@@ -61,18 +96,42 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 ### F-04: Category Catalogue
 * **Linked Requirements:** FR-06, FR-07, BR-05, BR-10
 * **Description:** Provides shared categories for transactions. Administrator can create new categories with case-insensitive unique names within type; any signed-in user can list active categories.
+* **UI Behavior:**
+  * Admin categories view at `/admin/categories` (accessible only to Administrator role).
+  * Table listing all categories showing Name, Type badge, and Status (`Active` / `Inactive`).
+  * "Create Category" form allowing Admin to input Category Name and select Type (`INCOME` / `EXPENSE`).
+  * Inline validation error if category name already exists under the same type (case-insensitive).
+  * Non-admin Users visiting `/admin/categories` are redirected to a 403 Forbidden screen.
+  * Transaction form dropdown dynamically calls `GET /api/categories` to populate choices for both Users and Admins.
 * **API Specification:**
-  * `GET /api/categories`: Returns list of active categories (accessible by any signed-in user).
-  * `POST /api/categories`: `{ "name": "Travel", "type": "EXPENSE" }` (accessible only by Administrator).
+  * `GET /api/categories`: Returns `{ "data": [ { "id": "...", "name": "Food & Beverage", "type": "EXPENSE", "isActive": true } ] }` (Accessible to any authenticated user).
+  * `POST /api/categories`: `{ "name": "Travel", "type": "EXPENSE" }` $\to$ Returns HTTP 201 Created with `{ "data": { "id": "...", "name": "Travel", "type": "EXPENSE", "isActive": true } }` (Administrator only).
+* **Data / Schema Specification:**
+  * Table `categories`: `id` (UUID PK), `name` (VARCHAR(40)), `type` (`TransactionType` enum: `INCOME` | `EXPENSE`), `isActive` (BOOLEAN default `true`), `createdAt`, `updatedAt`.
+  * Unique constraint: `UNIQUE (name, type)` enforced case-insensitively in application logic and unique index.
 * **Acceptance Criteria:**
   * **AC-04-01 (Admin Create Category):** An Administrator can create a new category (HTTP 201 Created).
   * **AC-04-02 (Duplicate Name Rejection):** Attempting to create a category with a name differing only by case within the same type (e.g., "Food" and "food") returns HTTP 400 Bad Request.
   * **AC-04-03 (User Forbidden):** A User attempting `POST /api/categories` receives HTTP 403 Forbidden.
+  * **AC-04-04 (List Active Categories):** Any signed-in user (User or Administrator) can retrieve active categories via `GET /api/categories` (HTTP 200 OK); inactive categories are excluded.
 
 ---
 
 ### F-05: Access Control and Data Ownership (Cross-cutting)
 * **Linked Requirements:** NFR-01, BR-04, BR-07, BR-10
+* **Description:** Cross-cutting security and authorization boundary enforcing session authentication, role-based route permissions, and record-level tenant isolation.
+* **UI Behavior:**
+  * Navigation bar dynamically hides unauthorized links (Users do not see Admin category management links; Admins do not see User transaction forms).
+  * Direct URL access to forbidden routes (e.g. User navigating to `/admin/*`) renders a dedicated 403 Access Denied screen.
+  * Direct URL access to nonexistent or another user's transaction ID displays a 404 Not Found screen.
+  * Unauthenticated requests to protected routes redirect immediately to `/login` preserving target return URL.
+* **API Specification:**
+  * Express middleware (`requireAuth`, `requireRole`, `requireOwner`) guards all endpoints.
+  * `GET /api/transactions/:id`: Returns HTTP 404 Not Found when requested ID belongs to another user (BR-04, D-04).
+  * Admin calling `GET /api/transactions`: Returns HTTP 403 Forbidden (BR-07).
+  * Unauthenticated request to `/api/transactions` or `/api/categories`: Returns HTTP 401 Unauthorized.
+* **Data / Schema Specification:**
+  * **No new schema changes required:** Enforces isolation purely at the application/query layer using `WHERE userId = req.user.id` on existing relational schema.
 * **Acceptance Criteria:**
   * **AC-05-01 (Unauthenticated Rejection):** Requests to `/api/transactions` or `/api/categories` without a valid session return HTTP 401 without private data.
   * **AC-05-02 (Private Transaction Isolation):** If User A requests `GET /api/transactions/:id` of User B's transaction, the API returns HTTP 404 Not Found (revealing no existence or data).
@@ -82,8 +141,18 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 
 ### F-06: Delivery Baseline (Cross-cutting)
 * **Linked Requirements:** NFR-05, NFR-08
+* **Description:** Cross-cutting delivery foundation covering environment configuration, local reproducibility, health probes, and zero-secret repository hygiene.
+* **UI Behavior:**
+  * **No dedicated UI component required:** In single-container production mode, the Express server statically serves the precompiled React SPA build from `/app/client/dist` for non-API routes.
+* **API Specification:**
+  * `GET /api/health`: Liveness probe $\to$ HTTP 200 OK `{ "status": "ok", "timestamp": "..." }`.
+  * `GET /api/ready`: Readiness probe $\to$ Runs DB ping (`SELECT 1`). Returns HTTP 200 OK `{ "status": "ok", "database": "connected" }` or HTTP 503 Service Unavailable `{ "status": "error", "error": "Database unreachable" }`.
+* **Data / Schema Specification:**
+  * Baseline Prisma migration creates all PostgreSQL tables (`users`, `sessions`, `categories`, `transactions`).
+  * Idempotent seed script (`prisma/seed.ts`) populates initial Administrator (`admin@pocket48.local`), demo users (`user1@pocket48.local`, `user2@pocket48.local`), and initial categories.
+  * Offline test stubs (`deploy/tests/test_deploy_stub.sh`, `test_release_stub.sh`) validated for CI/CD release safety without cloud credentials.
 * **Acceptance Criteria:**
-  * **AC-06-01 (Clean Clone Execution):** Running `npm install && npx prisma migrate deploy && npm run seed && npm test` succeeds from a fresh clone using only `.env.example`.
+  * **AC-06-01 (Clean Clone Execution):** Running `npm install && npx prisma migrate deploy && npm run prisma:seed && npm test` succeeds from a fresh clone using only `.env.example`.
   * **AC-06-02 (Zero Committed Secrets):** No password, connection string, or secret appears in repository files.
 
 ---
@@ -105,6 +174,12 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 | **TEST-11** | AC-05-03 | Integration (Security) | Administrator is signed in | GET `/api/transactions` | 403 Forbidden (Admin privacy restriction) |
 | **TEST-12** | AC-04-02 | Integration (API) | Category "Food" exists | Admin POST `/api/categories` with name `"food"` | 400 Bad Request (Duplicate name case-insensitive) |
 | **TEST-13** | AC-06-01 | End-to-End (UI) | App running locally from clean clone | Playwright E2E: User logs in, creates expense, verifies in table | Journey completes successfully without UI glitches |
+| **TEST-14** | AC-01-04 | Integration (API) | Seeded user is `USER` role | Request login and examine `me` endpoint; forge role payload | Role strictly returns `USER` irrespective of client request |
+| **TEST-15** | AC-03-02 | Integration (API) | User A and User B both have transactions | User A calls GET `/api/transactions` | List contains 100% User A transactions; 0 of User B |
+| **TEST-16** | AC-04-01 | Integration (API) | Administrator is signed in | POST `/api/categories` with `{ "name": "Health", "type": "EXPENSE" }` | 201 Created, category persists in database |
+| **TEST-17** | AC-05-01 | Integration (Security) | No session cookie provided | GET `/api/transactions`, GET `/api/categories` | 401 Unauthorized for all protected routes |
+| **TEST-18** | AC-06-02 | Repository (Hygiene) | Git repository working tree | Scan repository files for `.env`, passwords, or secret keys | Zero leaks detected; `.env.example` contains only placeholders |
+| **TEST-19** | AC-04-04 | Integration (API) | Signed in as User or Administrator; DB contains active and inactive categories | GET `/api/categories` | 200 OK, returns active categories only; inactive categories excluded |
 
 ---
 
@@ -121,3 +196,15 @@ A Sprint 1 feature is complete only when all of the following conditions are met
 5. **Quality Gate:** Passes the CI pipeline (`test-and-docker`) before merging into `staging` and `main`.
 6. **Documentation & Hygiene:** Setup instructions in `README.md` and `.env.example` remain accurate; no secrets are committed.
 
+---
+
+## 4. Known Limitations & Scope Exclusions for Sprint 1
+
+The following capabilities are explicitly deferred to later sprints in accordance with `docs/sprints/plan.md`:
+* **Transaction Management (F-07):** Viewing full transaction detail, editing, and deleting transactions are deferred to Sprint 2.
+* **Filtering & Search (F-08):** Filtering by month, type, and category is deferred to Sprint 2.
+* **Monthly Summary & Balance Cards (F-09):** Aggregated monthly income, expense totals, and category breakdown are deferred to Sprint 2.
+* **Category Lifecycle (F-10):** Renaming and deactivating categories by Administrator are deferred to Sprint 2.
+* **Account Administration (F-11):** Administrator UI for activating and deactivating user accounts is deferred to Sprint 2.
+* **Monthly Budgets (F-13):** Setting budgets per category and overspending warnings are deferred to Sprint 3.
+* **CSV Export (F-14):** Exporting transaction history to CSV format is deferred to Sprint 3.
