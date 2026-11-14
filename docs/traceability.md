@@ -10,7 +10,7 @@ Version 1.0 (BASELINE). Sprint 1 AC and TEST IDs refer directly to `docs/sprints
 | FR-04 | F-02 | 1 | Sprint 1; AC-02-01 / TEST-04, TEST-13 (API + DB test; UI journey) |
 | FR-05 | F-03 | 1 | Sprint 1; AC-03-01, AC-03-02 / TEST-08, TEST-15 (API + DB test) |
 | FR-06 | F-04 | 1 | Sprint 1; AC-04-01 / TEST-16 (API test: Administrator creates category) |
-| FR-07 | F-04 | 1 | Sprint 1; AC-04-01 / TEST-16 (API test: list active categories) |
+| FR-07 | F-04 | 1 | Sprint 1; AC-04-04 / TEST-19 (API test: list active categories) |
 | FR-08 | F-07 | 2 | Sprint 2 (deferred) |
 | FR-09 | F-07 | 2 | Sprint 2 (deferred) |
 | FR-10 | F-07 | 2 | Sprint 2 (deferred) |
