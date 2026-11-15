@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ApiError, categoriesApi } from '../api/client';
 import { AppShell } from '../components/AppShell';
+import { TrendingUpIcon, TrendingDownIcon } from '../components/Icons';
 import type { Category, TransactionType } from '../types/auth';
 
 export const AdminCategoriesPage: React.FC = () => {
@@ -143,10 +144,38 @@ export const AdminCategoriesPage: React.FC = () => {
                 <label htmlFor="category-type" className="form-label">
                   Category Type
                 </label>
+                <div className="type-toggle-bar">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setType('EXPENSE');
+                      setFormError(null);
+                    }}
+                    className={`type-toggle-btn ${
+                      type === 'EXPENSE' ? 'active-expense' : ''
+                    }`}
+                  >
+                    <TrendingDownIcon size={16} />
+                    <span>Expense</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setType('INCOME');
+                      setFormError(null);
+                    }}
+                    className={`type-toggle-btn ${
+                      type === 'INCOME' ? 'active-income' : ''
+                    }`}
+                  >
+                    <TrendingUpIcon size={16} />
+                    <span>Income</span>
+                  </button>
+                </div>
                 <select
                   id="category-type"
                   name="type"
-                  className="form-input"
+                  className="form-input form-select-styled"
                   value={type}
                   onChange={(e) => {
                     setType(e.target.value as TransactionType);
@@ -200,9 +229,16 @@ export const AdminCategoriesPage: React.FC = () => {
                 </thead>
                 <tbody>
                   {categories.map((cat) => (
-                    <tr key={cat.id} data-testid="category-row">
-                      <td>{cat.name}</td>
-                      <td>
+                    <tr
+                      key={cat.id}
+                      data-testid="category-row"
+                      className="category-item-row"
+                    >
+                      <td className="category-name-cell">
+                        <span className="category-cell-name">{cat.name}</span>
+                      </td>
+                      <td className="category-type-cell">
+                        <span className="mobile-meta-label">Type</span>
                         <span
                           className={`type-badge ${
                             cat.type === 'INCOME'
@@ -210,10 +246,29 @@ export const AdminCategoriesPage: React.FC = () => {
                               : 'type-expense'
                           }`}
                         >
+                          {cat.type === 'INCOME' ? (
+                            <TrendingUpIcon size={12} className="badge-arrow" />
+                          ) : (
+                            <TrendingDownIcon size={12} className="badge-arrow" />
+                          )}
                           {cat.type}
                         </span>
                       </td>
-                      <td>{cat.isActive !== false ? 'Active' : 'Inactive'}</td>
+                      <td className="category-status-cell">
+                        <span className="mobile-meta-label">Status</span>
+                        <span
+                          className={`status-pill ${
+                            cat.isActive !== false
+                              ? 'status-active'
+                              : 'status-inactive'
+                          }`}
+                        >
+                          <span className="status-dot" />
+                          <span>
+                            {cat.isActive !== false ? 'Active' : 'Inactive'}
+                          </span>
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SakuraBackground } from './SakuraBackground';
 import { AmbianceSwitcher } from './AmbianceSwitcher';
@@ -10,13 +10,23 @@ import {
   TagIcon,
   UserIcon,
   LogoutIcon,
+  MenuIcon,
+  CloseIcon,
 } from './Icons';
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
+
+  // Close mobile nav drawer whenever route changes
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
+    setIsMobileNavOpen(false);
     await logout();
     navigate('/login', { replace: true });
   };
@@ -31,8 +41,13 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
       <header className="app-header">
         <div className="header-inner">
-          <div className="brand-and-nav">
-            <Link to={homePath} className="brand-link" aria-label="pocKet48 Home">
+          <div className="brand-bar-mobile">
+            <Link
+              to={homePath}
+              className="brand-link"
+              aria-label="pocKet48 Home"
+              onClick={() => setIsMobileNavOpen(false)}
+            >
               <span className="brand-icon-wrapper">
                 <SakuraIcon size={26} className="brand-sakura" />
               </span>
@@ -42,12 +57,29 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
             </Link>
 
             {user && (
+              <div className="mobile-header-actions">
+                <button
+                  type="button"
+                  onClick={() => setIsMobileNavOpen((prev) => !prev)}
+                  className="btn-mobile-menu"
+                  aria-label={isMobileNavOpen ? 'Close menu' : 'Open menu'}
+                  aria-expanded={isMobileNavOpen}
+                >
+                  {isMobileNavOpen ? <CloseIcon size={22} /> : <MenuIcon size={22} />}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {user && (
+            <div className={`nav-collapsible ${isMobileNavOpen ? 'nav-open' : ''}`}>
               <nav aria-label="Main navigation" className="main-nav">
                 {user.role === 'USER' && (
                   <>
                     <NavLink
                       to="/transactions"
                       end
+                      onClick={() => setIsMobileNavOpen(false)}
                       className={({ isActive }) =>
                         `nav-link ${isActive ? 'active' : ''}`
                       }
@@ -57,6 +89,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                     </NavLink>
                     <NavLink
                       to="/transactions/new"
+                      onClick={() => setIsMobileNavOpen(false)}
                       className={({ isActive }) =>
                         `nav-link ${isActive ? 'active' : ''}`
                       }
@@ -69,6 +102,7 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 {user.role === 'ADMINISTRATOR' && (
                   <NavLink
                     to="/admin/categories"
+                    onClick={() => setIsMobileNavOpen(false)}
                     className={({ isActive }) =>
                       `nav-link ${isActive ? 'active' : ''}`
                     }
@@ -78,37 +112,37 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   </NavLink>
                 )}
               </nav>
-            )}
-          </div>
 
-          {user && (
-            <div className="user-controls">
-              <AmbianceSwitcher />
-              <div className="user-profile-badge">
-                <span className="user-avatar-dot">
-                  <UserIcon size={13} />
-                </span>
-                <span
-                  className="user-display-name"
-                  data-testid="user-display-name"
+              <div className="user-controls">
+                <div className="ambiance-ctrl-wrap">
+                  <AmbianceSwitcher />
+                </div>
+                <div className="user-profile-badge">
+                  <span className="user-avatar-dot">
+                    <UserIcon size={13} />
+                  </span>
+                  <span
+                    className="user-display-name"
+                    data-testid="user-display-name"
+                  >
+                    {user.displayName}
+                  </span>
+                  <span
+                    className={`role-badge role-${user.role.toLowerCase()}`}
+                    data-testid="user-role-badge"
+                  >
+                    {user.role}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="btn btn-secondary btn-sm btn-logout"
                 >
-                  {user.displayName}
-                </span>
-                <span
-                  className={`role-badge role-${user.role.toLowerCase()}`}
-                  data-testid="user-role-badge"
-                >
-                  {user.role}
-                </span>
+                  <LogoutIcon size={14} className="logout-icon" />
+                  <span>Sign Out</span>
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="btn btn-secondary btn-sm btn-logout"
-              >
-                <LogoutIcon size={14} className="logout-icon" />
-                <span>Sign Out</span>
-              </button>
             </div>
           )}
         </div>
