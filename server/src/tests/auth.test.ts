@@ -69,7 +69,7 @@ describe('F-01: Authentication & Session Contracts (TDD)', () => {
     expect(res.body.data.passwordHash).toBeUndefined();
 
     // Verify session cookie is set and HttpOnly
-    const cookies = res.headers['set-cookie'];
+    const cookies = res.headers['set-cookie'] as string[] | undefined;
     expect(cookies).toBeDefined();
     const sessionCookie = cookies?.find((c: string) => c.startsWith('pocket48_session='));
     expect(sessionCookie).toBeDefined();
@@ -130,7 +130,7 @@ describe('F-01: Authentication & Session Contracts (TDD)', () => {
       .send({ email: testUserEmail, password: testUserPassword });
     expect(loginRes.status).toBe(200);
 
-    const cookies = loginRes.headers['set-cookie'];
+    const cookies = loginRes.headers['set-cookie'] as string[];
     const sessionCookie = cookies.find((c: string) => c.startsWith('pocket48_session='));
 
     // 2. Artificially expire the session in PostgreSQL
@@ -168,7 +168,7 @@ describe('F-01: Authentication & Session Contracts (TDD)', () => {
       .send({ email: testUserEmail, password: testUserPassword });
     expect(loginRes.status).toBe(200);
 
-    const cookies = loginRes.headers['set-cookie'];
+    const cookies = loginRes.headers['set-cookie'] as string[];
     const sessionCookie = cookies.find((c: string) => c.startsWith('pocket48_session='));
 
     // 2. Call GET /api/auth/me with session cookie (TEST-14 role integrity)

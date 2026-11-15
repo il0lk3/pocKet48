@@ -2,6 +2,16 @@ import React, { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../api/client';
+import { SakuraBackground } from '../components/SakuraBackground';
+import { AmbianceSwitcher } from '../components/AmbianceSwitcher';
+import {
+  SakuraIcon,
+  SparkleIcon,
+  MailIcon,
+  LockIcon,
+  EyeIcon,
+  EyeOffIcon,
+} from '../components/Icons';
 
 export const LoginPage: React.FC = () => {
   const { user, isLoading, login } = useAuth();
@@ -10,6 +20,7 @@ export const LoginPage: React.FC = () => {
 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [formError, setFormError] = useState<string>('');
@@ -18,7 +29,10 @@ export const LoginPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="loading-state" role="status" aria-live="polite">
-        Loading session...
+        <span className="loading-spinner-svg">
+          <SakuraIcon size={28} className="spin-slow" />
+        </span>
+        <span>Loading session...</span>
       </div>
     );
   }
@@ -87,76 +101,121 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-card">
-        <h1 className="auth-title">Sign In to Pocket48</h1>
-        <p className="auth-subtitle">
-          Personal Money and Expense Logging System
-        </p>
+      {/* Dreamy Stage Ambiance & Sakura Tree Canopy */}
+      <SakuraBackground />
 
-        {formError && (
-          <div className="alert alert-error" role="alert">
-            {formError}
+      <div className="auth-ambiance-corner">
+        <AmbianceSwitcher />
+      </div>
+
+      <div className="auth-content-flow">
+        {/* Top Branding Section matching Reference Image 1 */}
+        <div className="auth-top-branding">
+          <div className="auth-logo-halo-grand">
+            <div className="auth-logo-pulse-ring" />
+            <SakuraIcon size={38} className="auth-sakura-icon" />
           </div>
-        )}
+          <div className="auth-brand-title">Pocket<span className="brand-48">48</span></div>
+          <p className="auth-brand-motto">
+            Track your income, manage your expenses
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} noValidate className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              aria-invalid={Boolean(emailError)}
-              aria-describedby={emailError ? 'email-error' : undefined}
-              className="form-input"
-              placeholder="name@pocket48.local"
-              required
-            />
-            {emailError && (
-              <p id="email-error" className="field-error" role="alert">
-                {emailError}
-              </p>
-            )}
-          </div>
+        {/* Grand Glassmorphic Card matching Reference Image 1 */}
+        <div className="auth-card auth-card-extravagant">
+          <h1 className="auth-title" aria-label="Sign In to Pocket48">
+            Sign In to Pocket<span className="brand-48">48</span>
+          </h1>
+          <p className="auth-subtitle">Welcome back!</p>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              aria-invalid={Boolean(passwordError)}
-              aria-describedby={passwordError ? 'password-error' : undefined}
-              className="form-input"
-              required
-            />
-            {passwordError && (
-              <p id="password-error" className="field-error" role="alert">
-                {passwordError}
-              </p>
-            )}
-          </div>
+          {formError && (
+            <div className="alert alert-error" role="alert">
+              {formError}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="btn btn-primary btn-block"
-          >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} noValidate className="auth-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <div className="input-with-icon-wrapper">
+                <span className="input-lead-icon">
+                  <MailIcon size={18} />
+                </span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  aria-invalid={Boolean(emailError)}
+                  aria-describedby={emailError ? 'email-error' : undefined}
+                  className="form-input form-input-with-icon"
+                  placeholder="name@pocket48.local"
+                  required
+                />
+              </div>
+              {emailError && (
+                <p id="email-error" className="field-error" role="alert">
+                  {emailError}
+                </p>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <div className="input-with-icon-wrapper">
+                <span className="input-lead-icon">
+                  <LockIcon size={18} />
+                </span>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  aria-invalid={Boolean(passwordError)}
+                  aria-describedby={passwordError ? 'password-error' : undefined}
+                  className="form-input form-input-with-icon form-input-with-trail"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="input-trail-icon-btn"
+                  aria-label={showPassword ? 'Hide secret text' : 'Show secret text'}
+                  title={showPassword ? 'Hide secret text' : 'Show secret text'}
+                >
+                  {showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
+                </button>
+              </div>
+              {passwordError && (
+                <p id="password-error" className="field-error" role="alert">
+                  {passwordError}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn btn-primary btn-block btn-stage-grand"
+            >
+              <SparkleIcon size={16} className="btn-sparkle-lead" />
+              <span>{isSubmitting ? 'Signing in...' : 'Sign In'}</span>
+            </button>
+          </form>
+
+          <p className="auth-card-footer-note">
+            Don't have an account? Contact your administrator
+          </p>
+        </div>
       </div>
     </div>
   );
 };
-
