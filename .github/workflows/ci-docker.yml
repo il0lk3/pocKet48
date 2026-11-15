@@ -126,6 +126,8 @@ jobs:
         working-directory: ./server
         env:
           DATABASE_URL: postgresql://pocket48:pocket48@localhost:5432/pocket48?schema=public
+          ADMIN_PASSWORD: ci-admin-initial-password
+          DEMO_USER_PASSWORD: ci-demo-initial-password
         run: |
           npm ci
           npx prisma migrate deploy

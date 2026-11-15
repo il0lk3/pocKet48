@@ -1,0 +1,76 @@
+# Sprint 1 — AC-to-Test Results & Verification Report
+
+**Project:** Pocket48 — Personal Money and Expense Logging System  
+**Sprint:** Sprint 1 (Core Auth, Categories, Transaction Create/List, Ownership Security & Delivery Baseline)  
+**Base Integration Commit (`staging`):** `7ae6aa2` (`Merge pull request #34 from il0lk3/feat/33-pastel-theme-ui`)  
+**Tested Commit (`test/11-e2e-journey`):** `1bccece` (Issue #11)  
+**Execution Date:** 2026-11-15  
+
+---
+
+## 1. Automated Test Execution Summary
+
+All automated test suites (Domain Unit, API/Database/Security Integration, Frontend Component, Repository Hygiene, and Browser End-to-End) were executed against a clean local PostgreSQL 16 instance seeded solely via `npx prisma migrate deploy && npm run prisma:seed` using configuration copied from `server/.env.example`.
+
+| Suite / Layer | Command | Test Files | Tests Passed | Failed | Skipped | Status |
+|---|---|---:|---:|---:|---:|---|
+| **Server Unit, API Integration & Security** | `npm test --prefix server` | 6 (`auth`, `transactions_create`, `transactions_list`, `categories`, `ready`, `repo_hygiene`) | **35** | 0 | 0 | **PASS** |
+| **Client Component & Route Guard UI** | `npm test --prefix client` | 2 (`AppShellAndAuth`, `TransactionsAndCategories`) | **11** | 0 | 0 | **PASS** |
+| **End-to-End Browser Journey (Playwright)** | `npm run test:e2e --prefix client` | 1 (`e2e/sprint1-journey.spec.ts`) | **1** | 0 | 0 | **PASS** |
+| **Production Bundle & Type Check** | `npm run build --prefix client` | TypeScript + Vite SPA build | — | 0 | 0 | **PASS** |
+| **Total Automated Tests** | `npm test && npm run test:e2e` | **9 files** | **47** | **0** | **0** | **100% PASS** |
+
+---
+
+## 2. Sprint 1 AC-to-Test Traceability & Results Table (Automated Verification)
+
+Every Sprint 1 Acceptance Criterion (`AC-01-01` through `AC-06-02`) defined in [`docs/sprints/sprint-1/contracts.md`](./contracts.md) is mapped below to its planned Software Test Specification ID (`TEST-01` through `TEST-19`), actual test file and test case name, execution command, and verified result.
+
+| Feature | AC ID | Acceptance Criterion Summary | Planned Test ID | Test Level | Actual Test File & Test Case Name | Command | Result |
+|---|---|---|---|---|---|---|---|
+| **F-01** | **AC-01-01** | Valid login sets `pocket48_session` HTTP-only cookie and returns user profile without password hash; UI routes to role landing page | **TEST-01** | Integration (API) + Component (UI) | `server/src/tests/auth.test.ts` — `TEST-01: Valid login returns 200, sets pocket48_session cookie, and returns user profile without password or hash`<br>`client/src/__tests__/AppShellAndAuth.test.tsx` — `logs in as USER, loads current user from /api/auth/me with credentials, and navigates to /transactions` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-01** | **AC-01-02** | Invalid email, wrong password, or inactive account returns HTTP `401` with generic message `"Invalid email or password"` | **TEST-02** | Integration (API) + Component (UI) | `server/src/tests/auth.test.ts` — `TEST-02: Incorrect password returns 401 with generic error message`; `TEST-02: Non-existent email returns 401 with generic error message`; `Deactivated user cannot log in and returns 401 with generic error message`<br>`client/src/__tests__/AppShellAndAuth.test.tsx` — `displays a visible generic error message when login fails (AC-01-02)` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-01** | **AC-01-03** | Logout deletes session row in PostgreSQL, clears cookie, and subsequent `/api/auth/me` returns `401` (including expired sessions per `NFR-03`) | **TEST-03** | Integration (API) + Component (UI) | `server/src/tests/auth.test.ts` — `TEST-03 & TEST-14: Valid session can access /me, role comes strictly from DB, and logout invalidates session`; `NFR-03: Expired session returns 401 on /api/auth/me and is cleaned up from PostgreSQL`<br>`client/src/__tests__/AppShellAndAuth.test.tsx` — `logs out via POST /api/auth/logout and redirects back to /login` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-01** | **AC-01-04** | Role is resolved strictly from authenticated server session (`users.role` in DB); forged client role payloads are ignored | **TEST-14** | Integration (API) | `server/src/tests/auth.test.ts` — `TEST-03 & TEST-14: Valid session can access /me, role comes strictly from DB, and logout invalidates session` | `npm test --prefix server` | **PASS** |
+| **F-02** | **AC-02-01** | Valid `120.50` THB expense in `"Food"` persists as `12050` integer satang (`amountSatang`) and returns `201 Created` | **TEST-04** | Integration (API + DB) + Component (UI) | `server/src/tests/transactions_create.test.ts` — `TEST-04 (AC-02-01): User creates a valid expense of 120.50 THB and it is stored as 12050 integer satang in database`<br>`client/src/__tests__/TransactionsAndCategories.test.tsx` — `submits a valid 120.50 THB expense and shows it in the transactions table (F-02, AC-02-01)` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-02** | **AC-02-02** | Rejects amounts $\le 0$, $> 9,999,999.99$, or with $> 2$ decimal places (`BR-01`) with `400 Bad Request` and saves nothing | **TEST-05** | Unit (Domain) + Integration (API) | `server/src/tests/transactions_create.test.ts` — `TEST-05 (BR-01 Unit): validateAmount checks exact boundaries and decimal restrictions`; `TEST-05 (AC-02-02 / BR-01): Rejects amounts <= 0, > 9,999,999.99, and > 2 decimal places with 400 Bad Request, saving nothing`<br>`client/src/__tests__/TransactionsAndCategories.test.tsx` — `filters categories by selected type and validates amount, date, and note fields (F-02, BR-01..BR-03, NFR-06)` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-02** | **AC-02-03** | Rejects transaction when `category.type !== transaction.type` or category is inactive (`BR-02`) with `400 Bad Request` | **TEST-06** | Unit (Domain) + Integration (API) | `server/src/tests/transactions_create.test.ts` — `TEST-06 (BR-02 Unit): validateCategoryMatch verifies type agreement and active status`; `TEST-06 (AC-02-03 / BR-02): Rejects category type mismatch, nonexistent category, and inactive category with 400 Bad Request, saving nothing` | `npm test --prefix server` | **PASS** |
+| **F-02** | **AC-02-04** | Rejects future transaction dates in `Asia/Bangkok` (`UTC+7`, `BR-03`) with `400 Bad Request` | **TEST-07** | Unit (Domain) + Integration (API) | `server/src/tests/transactions_create.test.ts` — `TEST-07 (BR-03 Unit): validateTransactionDate enforces fixed-clock Asia/Bangkok midnight boundary`; `TEST-07 (AC-02-04 / BR-03): Rejects future dates in Asia/Bangkok (UTC+7) with 400 Bad Request, saving nothing` | `npm test --prefix server` | **PASS** |
+| **F-03** | **AC-03-01** | `GET /api/transactions` returns signed-in user's transactions ordered newest `transactionDate` first (`DESC`, then `createdAt DESC`) | **TEST-08** | Integration (API) + Component (UI) | `server/src/tests/transactions_list.test.ts` — `TEST-08 (AC-03-01): GET /api/transactions returns user own transactions in descending order of transaction date (newest first)`<br>`client/src/__tests__/TransactionsAndCategories.test.tsx` — `displays the signed-in user transactions ordered newest date first with THB formatting (F-03, AC-03-01)` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-03** | **AC-03-02** | `GET /api/transactions` contains 100% own records and 0% of another user's records (`BR-04`) | **TEST-15** | Integration (API) | `server/src/tests/transactions_list.test.ts` — `TEST-15 (AC-03-02): GET /api/transactions contains 100% own transactions and 0% of another user transactions` | `npm test --prefix server` | **PASS** |
+| **F-04** | **AC-04-01** | Administrator creates a valid category via `POST /api/categories` (`201 Created`) and it persists in PostgreSQL | **TEST-16** | Integration (API) + Component (UI) | `server/src/tests/categories.test.ts` — `TEST-16 (AC-04-01): Administrator can create a valid category (201 Created) and it persists in the database`<br>`client/src/__tests__/TransactionsAndCategories.test.tsx` — `allows ADMINISTRATOR to list categories, create a new category, and see duplicate-name validation errors (F-04, AC-04-01, AC-04-02)` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-04** | **AC-04-02** | Rejects duplicate category names within the same `type` regardless of letter case (`BR-05`) with `400 Bad Request` | **TEST-12** | Integration (API) + Component (UI) | `server/src/tests/categories.test.ts` — `TEST-12 (AC-04-02): Duplicate category name differing only by letter case within the same type returns 400 Bad Request` | `npm test --prefix server` | **PASS** |
+| **F-04** | **AC-04-03** | Standard `USER` calling `POST /api/categories` receives `403 Forbidden` | **TEST-10** | Integration (Security) | `server/src/tests/categories.test.ts` — `TEST-10 (AC-04-03): User attempting to create a category receives 403 Forbidden` | `npm test --prefix server` | **PASS** |
+| **F-04** | **AC-04-04** | Signed-in `USER` and `ADMINISTRATOR` can list active categories via `GET /api/categories`, while inactive categories are excluded | **TEST-19** | Integration (API) | `server/src/tests/categories.test.ts` — `TEST-19 (AC-04-04): Signed-in User and Administrator can list active categories via GET /api/categories while inactive categories are excluded` | `npm test --prefix server` | **PASS** |
+| **F-05** | **AC-05-01** | Unauthenticated requests to `/api/auth/me`, `/api/transactions`, or `/api/categories` return `401 Unauthorized` with no private data | **TEST-17** | Integration (Security) + Component (UI) | `server/src/tests/categories.test.ts` — `TEST-17 (AC-05-01): Anonymous requests across all protected routes return 401 Unauthorized without private data`<br>`server/src/tests/auth.test.ts` — `TEST-17: GET /api/auth/me without session cookie returns 401`<br>`client/src/__tests__/AppShellAndAuth.test.tsx` — `redirects unauthenticated visitors from protected routes to /login with labelled fields and no default password or role selector` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-05** | **AC-05-02** | Requesting another user's transaction via `GET /api/transactions/:id` returns `404 Not Found` (`BR-04`, no existence leakage) | **TEST-09** | Integration (Security) | `server/src/tests/transactions_list.test.ts` — `TEST-09 (AC-05-02 / BR-04): User B requesting User A transaction returns 404 Not Found without disclosing existence` | `npm test --prefix server` | **PASS** |
+| **F-05** | **AC-05-03** | `ADMINISTRATOR` calling `/api/transactions` receives `403 Forbidden` (`BR-07`, admin privacy boundary) | **TEST-11** | Integration (Security) + Component (UI) | `server/src/tests/transactions_list.test.ts` — `TEST-11 (AC-05-03 / BR-07): Administrator requesting transaction routes receives 403 Forbidden`<br>`client/src/__tests__/AppShellAndAuth.test.tsx` — `renders 403 Access Denied when a USER navigates to /admin/categories or an ADMINISTRATOR navigates to /transactions` | `npm test --prefix server`<br>`npm test --prefix client` | **PASS** |
+| **F-06** | **AC-06-01** | End-to-end journey on clean setup: User logs in, sees validation error on rejected amount (`0`), creates valid `120.50` THB `"Food"` expense, reloads page, and sees persisted transaction in the list | **TEST-13** | End-to-End (Playwright UI) | `client/e2e/sprint1-journey.spec.ts` — `TEST-13 (AC-06-01): User logs in, sees validation error on invalid amount, creates a 120.50 THB Food expense, reloads page, and verifies persistence in the list` | `npm run test:e2e --prefix client` | **PASS** |
+| **F-06** | **AC-06-02** | Zero committed secrets in git tree; `.env` is gitignored and `server/.env.example` contains only safe placeholders | **TEST-18** | Repository Hygiene (Automated + Manual) | `server/src/tests/repo_hygiene.test.ts` — `TEST-18 (AC-06-02): .env files are not tracked in git and .env.example contains only safe placeholders` | `npm test --prefix server` | **PASS** |
+
+---
+
+## 3. Additional Infrastructure & Edge-Case Automated Tests
+
+Beyond the 19 core STS test IDs (`TEST-01`..`TEST-19`), the following automated tests verify health/readiness probes (`F-06`), note length limits (`NFR-06`), session expiration (`NFR-03`), and unknown route handling (`404`):
+
+| Feature / NFR | Test File | Test Case Name | Command | Result |
+|---|---|---|---|---|
+| **F-06** (`GET /api/health`) | `server/src/tests/ready.test.ts` | `GET /api/health returns 200 and liveness payload` | `npm test --prefix server` | **PASS** |
+| **F-06** (`GET /api/ready` 200) | `server/src/tests/ready.test.ts` | `GET /api/ready returns 200 and connected status when database is reachable` | `npm test --prefix server` | **PASS** |
+| **F-06** (`GET /api/ready` 503) | `server/src/tests/ready.test.ts` | `GET /api/ready returns 503 and disconnected status when database is unreachable` | `npm test --prefix server` | **PASS** |
+| **NFR-06** (Note $\le 200$ chars) | `server/src/tests/transactions_create.test.ts` | `rejects notes exceeding 200 characters with 400 Bad Request` | `npm test --prefix server` | **PASS** |
+| **F-01** (Unauthenticated logout) | `server/src/tests/auth.test.ts` | `Unauthenticated POST /api/auth/logout returns 401 (system-sds.md Section 3.3 matrix)` | `npm test --prefix server` | **PASS** |
+| **F-05** (Unknown UI route 404) | `client/src/__tests__/AppShellAndAuth.test.tsx` | `shows a clear 404 Page Not Found screen for unknown routes` | `npm test --prefix client` | **PASS** |
+
+---
+
+## 4. Manual & Repository Verification Checks (Separated from Automated Suites)
+
+In accordance with the Sprint 1 test reporting requirements, repository-level and clean-setup checks are reported separately below alongside their automated counterparts:
+
+| Check ID | Linked AC | Verification Method | Procedure Executed | Observed Outcome | Status |
+|---|---|---|---|---|---|
+| **MANUAL-01** (`TEST-18`) | **AC-06-02** | Repository Git Tree & Secret Scan | 1. Ran `git ls-files` and verified no `.env` file is tracked.<br>2. Inspected `server/.env.example` and `.github/workflows/deploy.yml` to confirm all sensitive values use placeholders or GitHub Actions `secrets.*`. | Zero secrets, passwords, or private keys committed in repository history or working tree. | **PASS** |
+| **MANUAL-02** (`AC-06-01`) | **AC-06-01** | Clean Environment Setup & Migration Reproducibility | 1. Copied `server/.env.example` to `server/.env`.<br>2. Started PostgreSQL 16 via `docker compose up -d db`.<br>3. Executed `npx prisma migrate deploy` and `npm run prisma:seed` in `server/`.<br>4. Executed `npm test` and `npm run test:e2e`. | Schema migration (`20260414180000_init`) and idempotent seed succeeded cleanly; all 47 automated tests passed without manual database intervention. | **PASS** |
+| **MANUAL-03** (`Lab 5 Stub`) | **F-06** | Offline Deployment & Release Script Verification | Executed `bash deploy/tests/test_deploy_stub.sh` and `bash deploy/tests/test_release_stub.sh`. | Both offline deployment/release verification scripts exited `0` without requiring live GCP credentials. | **PASS** |

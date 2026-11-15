@@ -200,8 +200,12 @@ model Transaction {
   4. **Category Catalogue (`/admin/categories`):** Administrator screen for listing and creating system categories.
 * **Shared UI States:**
   * **Loading State:** Skeletons or spinners during network requests.
-  * **Empty State:** Friendly guidance (e.g., "No transactions yet. Click 'Record Transaction' to start.").
+  * **Empty State:** Friendly guidance accompanied by custom 3D pastel wallet artwork (e.g., "No transactions yet. Click 'Record Transaction' to start.").
   * **Error State:** In-line field validation errors and prominent toast alerts for network/server errors.
+* **Design System & Visual Ambiance:**
+  * **48-Group Pastel Palette:** Primary brand orchid violet (`#8b5cf6`, BNK48), income fresh mint (`#86efb0`, CGM48), and expense baby pink (`#fda4bc`, AKB48) maintaining strict WCAG AA contrast.
+  * **Interactive Ambiance Switcher (`AmbianceSwitcher`):** User-selectable background atmosphere presets (🌸 Sakura Breeze with blooming cherry canopy, ✨ Idol Sparkle stage spotlight, 🍃 Fresh Mint morning foliage, or 🚫 Calm/Minimal zero-animation mode).
+  * **Ergonomic Controls:** Interactive calendar widget (`GrandCalendarPicker`) enforcing date boundaries (BR-03) and accessible password visibility toggle with SVG vector icons.
 
 ### 3.2 API Conventions & Request/Response Shape
 All API routes are prefixed with `/api`.
