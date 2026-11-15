@@ -3,7 +3,7 @@
 **Project:** Pocket48 — Personal Money and Expense Logging System  
 **Sprint:** Sprint 1 (Core Auth, Categories, Transaction Create/List, Ownership Security & Delivery Baseline)  
 **Base Integration Commit (`staging`):** `7ae6aa2` (`Merge pull request #34 from il0lk3/feat/33-pastel-theme-ui`)  
-**Verification Branch:** `test/11-e2e-journey` (Issue #11)  
+**Tested Commit (`test/11-e2e-journey`):** `1bccece` (Issue #11)  
 **Execution Date:** 2026-11-15  
 
 ---
