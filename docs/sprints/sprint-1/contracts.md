@@ -186,6 +186,11 @@ Project: Pocket48 — Personal Money and Expense Logging System.
 | **TEST-18** | AC-06-02 | Repository (Hygiene) | Git repository working tree | Scan repository files for `.env`, passwords, or secret keys | Zero leaks detected; `.env.example` contains only placeholders |
 | **TEST-19** | AC-04-04 | Integration (API) | Signed in as User or Administrator; DB contains active and inactive categories | GET `/api/categories` | 200 OK, returns active categories only; inactive categories excluded |
 
+### 2.1 Executed AC-to-Test Results Report
+
+For the complete Sprint 1 execution report mapping every Acceptance Criterion (`AC-01-01` through `AC-06-02`) and planned Test ID (`TEST-01` through `TEST-19`) to the implemented Vitest and Playwright test files, test case names, commands, and verified `PASS` results (as well as manual/repository checks), see:
+* **[`docs/sprints/sprint-1/test-results.md`](./test-results.md)**
+
 ---
 
 ## 3. Product Definition of Done (DoD) for Sprint 1

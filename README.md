@@ -31,6 +31,7 @@ All engineering specifications and design documents are version-controlled in th
 | [`docs/system-sds.md`](./docs/system-sds.md) | **Part C:** System-Level Software Design Specification (Architecture, Data Model, API, Security) |
 | [`docs/sprints/plan.md`](./docs/sprints/plan.md) | **Part D:** Three-Sprint Plan & Sprint 1 Demonstration Scenarios |
 | [`docs/sprints/sprint-1/contracts.md`](./docs/sprints/sprint-1/contracts.md) | **Part E:** Sprint 1 Feature Contracts, Acceptance Criteria (AC), Test Specs (STS) & DoD |
+| [`docs/sprints/sprint-1/test-results.md`](./docs/sprints/sprint-1/test-results.md) | **Part E:** Sprint 1 AC-to-Test Results Table (Automated & Manual Verification Report) |
 | [`docs/labs/lab-05/deployment.md`](./docs/labs/lab-05/deployment.md) | **Lab 5:** Deployment Guide, Environment Variables, Release & Rollback Procedures |
 
 ---
@@ -62,6 +63,29 @@ curl http://localhost:3000/api/ready
 ```bash
 docker compose down
 ```
+
+### Run Automated Tests (Unit, Integration, Component & E2E)
+
+With PostgreSQL running locally (e.g., `docker compose up -d db`) and `server/.env` configured from `server/.env.example`:
+
+```bash
+# 1. Apply migrations and seed baseline accounts & categories
+npm run prisma:migrate
+npm run prisma:seed
+
+# 2. Run all backend (unit + API/DB/security integration) and frontend (component) tests
+npm test
+# Or individually:
+npm test --prefix server
+npm test --prefix client
+
+# 3. Run Playwright End-to-End (E2E) browser journey test (TEST-13 / AC-06-01)
+npm run test:e2e
+# Or directly from client workspace:
+npm run test:e2e --prefix client
+```
+
+See [`docs/sprints/sprint-1/test-results.md`](./docs/sprints/sprint-1/test-results.md) for the full AC-to-test traceability and execution results table.
 
 ---
 
