@@ -1,0 +1,15 @@
+{
+  "name": "pocket48",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pocket48 — Personal Money and Expense Logging System",
+  "scripts": {
+    "test": "npm test --prefix server && npm test --prefix client",
+    "test:server": "npm test --prefix server",
+    "test:client": "npm test --prefix client",
+    "test:e2e": "npm run test:e2e --prefix client",
+    "build": "npm run build --prefix server && npm run build --prefix client",
+    "prisma:migrate": "npx --prefix server prisma migrate deploy",
+    "prisma:seed": "npm run prisma:seed --prefix server"
+  }
+}
