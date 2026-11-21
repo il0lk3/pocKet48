@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ==============================================================================
-# TokTickIT — Google Cloud Run & Cloud SQL Teardown Script
+# pocKet48 — Google Cloud Run & Cloud SQL Teardown Script
 # ==============================================================================
 # Usage:
 #   ./deploy/teardown.sh

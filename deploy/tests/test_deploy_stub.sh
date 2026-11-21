@@ -18,8 +18,8 @@
 #   CI runs it too (.github/workflows/ci-docker.yml).
 #
 # ⭐ CHANGE ME: if you rename resources in deploy/deploy.sh (e.g. the secret
-#    names toktickit-database-url / -admin-password / -demo-password, the DB
-#    user `toktickit`), update the matching strings below.
+#    names pocket48-database-url / -admin-password / -demo-password, the DB
+#    user `pocket48`), update the matching strings below.
 # ==============================================================================
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -58,7 +58,7 @@ if [ "${1:-} ${2:-}" = 'config get-value' ]; then
   exit 0
 fi
 if [ "${1:-} ${2:-} ${3:-}" = 'run services describe' ]; then
-  echo https://toktickit-stub.example.invalid
+  echo https://pocket48-stub.example.invalid
   exit 0
 fi
 if [ "${1:-} ${2:-} ${3:-}" = 'run jobs execute' ]; then
@@ -101,11 +101,9 @@ for MODE in first_run rerun partial job-fail demo; do
   [ "$MODE" != demo ] || export STUB_MODE=first_run
   export GCLOUD_LOG="$TEST_STATE_DIR/gcloud-$MODE.log"
   rm -f "$TEST_STATE_DIR/sql-pass" "$TEST_STATE_DIR"/payload-*
-  args=()
-  if [ "$MODE" = demo ]; then args+=(--demo); fi
   result=0
-  if [ ${#args[@]} -gt 0 ]; then
-    bash "$DEPLOY_SCRIPT" "${args[@]}" > "$TEST_STATE_DIR/output" 2>&1 || result=$?
+  if [ "$MODE" = demo ]; then
+    bash "$DEPLOY_SCRIPT" --demo > "$TEST_STATE_DIR/output" 2>&1 || result=$?
   else
     bash "$DEPLOY_SCRIPT" > "$TEST_STATE_DIR/output" 2>&1 || result=$?
   fi

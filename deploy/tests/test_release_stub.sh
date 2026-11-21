@@ -10,7 +10,7 @@
 #   4. invalid tag    : rejected before any gcloud call
 # HOW TO RUN (repo root, needs bash):  bash deploy/tests/test_release_stub.sh
 #   Prints `PASS ...` lines; any failure exits non-zero. CI runs it too.
-# ⭐ CHANGE ME: if you rename the image path `toktickit/toktickit` or the job /
+# ⭐ CHANGE ME: if you rename the image path `pocket48/pocket48` or the job /
 #    service names in deploy/release.sh, update the stub strings below.
 # ==============================================================================
 set -euo pipefail
