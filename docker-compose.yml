@@ -26,6 +26,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - path: ./server/.env
+        required: false
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       DATABASE_URL: postgresql://${POSTGRES_USER:-pocket48}:${POSTGRES_PASSWORD:-pocket48}@db:5432/${POSTGRES_DB:-pocket48}?schema=public
@@ -45,13 +48,23 @@ services:
         condition: service_healthy
       migrate:
         condition: service_completed_successfully
+    env_file:
+      - path: ./server/.env
+        required: false
     environment:
-      NODE_ENV: production
-      TZ: Asia/Bangkok
-      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-production}
+      TZ: ${TZ:-Asia/Bangkok}
+      PORT: ${PORT:-3000}
       DATABASE_URL: postgresql://${POSTGRES_USER:-pocket48}:${POSTGRES_PASSWORD:-pocket48}@db:5432/${POSTGRES_DB:-pocket48}?schema=public
+      SESSION_SECRET: ${SESSION_SECRET:-dev-pocket48-session-secret-at-least-32-chars}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
       - "3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   client:
     build:
@@ -62,7 +75,8 @@ services:
     container_name: pocket48-client
     restart: unless-stopped
     depends_on:
-      - server
+      server:
+        condition: service_healthy
     ports:
       - "5173:80"
 
