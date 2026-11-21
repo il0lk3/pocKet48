@@ -26,6 +26,10 @@ out/
 coverage/
 test-results/
 playwright-report/
+__pycache__/
+*.pyc
+.vite/
+pocKet48_Deliverable_1.*
 
 # OS and IDE files
 .DS_Store
