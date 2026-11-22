@@ -30,4 +30,8 @@ describe('F-06: Repository Hygiene & Zero Committed Secrets (TDD)', () => {
     expect(envExampleContent).not.toMatch(/AIza[0-9A-Za-z-_]{35}/);
     expect(envExampleContent).not.toMatch(/-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----/);
   });
+
+  it('DELIBERATE FAILURE (Issue #20 / C-02): prove required-check merge gate blocks failing PRs', () => {
+    expect(true).toBe(false);
+  });
 });
