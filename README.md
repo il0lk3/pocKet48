@@ -9,7 +9,7 @@ Pocket48 is a personal money and expense logging web application designed for in
 
 ## 1. System Overview & Technology Stack
 
-* **Frontend:** React 18, TypeScript, Vite, TailwindCSS
+* **Frontend:** React 18, TypeScript, Vite
 * **Backend:** Node.js 24, Express, TypeScript, RESTful API
 * **Database & ORM:** PostgreSQL 16, Prisma ORM
 * **Authentication:** Stateful server-side sessions stored in PostgreSQL, signed HTTP-only cookies
@@ -45,7 +45,7 @@ All engineering specifications and design documents are version-controlled in th
 ### Run with Docker Compose (Recommended)
 ```bash
 # 1. Copy environment template
-cp server/.env.example server/.env
+cp .env.example .env
 
 # 2. Build and start services (PostgreSQL, Migration, API, Frontend)
 docker compose up --build -d
