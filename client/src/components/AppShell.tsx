@@ -154,6 +154,11 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
         <p className="footer-text">
           <SakuraIcon size={16} className="footer-sakura" />
           <strong>pocKet48</strong> — Personal Money & Expense Logging System
+          <span className="footer-release" data-testid="release-commit">
+            {' · v1.0.0 ('}
+            {(import.meta.env.VITE_APP_COMMIT_SHA || 'dev').slice(0, 7)}
+            {')'}
+          </span>
         </p>
       </footer>
     </div>
