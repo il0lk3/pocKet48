@@ -107,8 +107,8 @@ jobs:
       PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
       REGION: ${{ vars.GCP_REGION }}
       # CHANGE ME: names of your Cloud Run service and migration job.
-      SERVICE_NAME: pocket48
-      MIGRATE_JOB_NAME: pocket48-migrate
+      SERVICE_NAME: s90606c10
+      MIGRATE_JOB_NAME: s90606c10-migrate
       # Image tag = commit SHA (or the rollback SHA that was typed in).
       IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
       ROLLBACK: ${{ inputs.image_tag != '' }}
@@ -146,14 +146,14 @@ jobs:
 
       # ------------------------------------------------------------------------
       # 4. Build and push the image (skipped for rollbacks)
-      #    CHANGE ME: image path `.../pocket48/pocket48` must match the
+      #    CHANGE ME: image path `.../s90606c10/pocket48` must match the
       #    Artifact Registry repo and service names (see deploy/release.sh).
       # ------------------------------------------------------------------------
       - name: Build and push image
         if: env.ROLLBACK != 'true'
         run: |
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
-          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/pocket48/pocket48:$IMAGE_TAG"
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/s90606c10/s90606c10:$IMAGE_TAG"
           docker build --tag "$IMAGE" .
           docker push "$IMAGE"
 
@@ -192,6 +192,6 @@ jobs:
             echo "- Digest: \`$DEPLOYED_IMAGE\`"
             echo "- Rollback: $ROLLBACK"
             echo "- URL: $SERVICE_URL"
-            echo '- Smoke test: passed (health, readiness/DB, HTML, categories).'
+            echo '- Smoke test: passed (health, readiness/DB, HTML; optional cookie login + /api/categories).'
             echo '- See smoke step for optional login check status.'
           } >> "$GITHUB_STEP_SUMMARY"

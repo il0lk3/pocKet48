@@ -10,14 +10,13 @@ async function main() {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const demoUserPassword = process.env.DEMO_USER_PASSWORD;
 
-  if (!adminPassword || !demoUserPassword) {
+  if (!adminPassword) {
     throw new Error(
-      'Missing required environment variables: ADMIN_PASSWORD and DEMO_USER_PASSWORD must be provided to seed the database.'
+      'Missing required environment variable: ADMIN_PASSWORD must be provided to seed the database.'
     );
   }
 
   const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
-  const demoUserPasswordHash = await bcrypt.hash(demoUserPassword, 10);
 
   // 1. Seed Administrator
   await prisma.user.upsert({
@@ -37,41 +36,46 @@ async function main() {
     },
   });
 
-  // 2. Seed Demo User 1
-  await prisma.user.upsert({
-    where: { email: 'user1@pocket48.local' },
-    update: {
-      passwordHash: demoUserPasswordHash,
-      displayName: 'Demo User 1',
-      role: Role.USER,
-      isActive: true,
-    },
-    create: {
-      email: 'user1@pocket48.local',
-      passwordHash: demoUserPasswordHash,
-      displayName: 'Demo User 1',
-      role: Role.USER,
-      isActive: true,
-    },
-  });
+  // 2. Seed Demo Users (only when DEMO_USER_PASSWORD is provided)
+  if (demoUserPassword) {
+    const demoUserPasswordHash = await bcrypt.hash(demoUserPassword, 10);
 
-  // 3. Seed Demo User 2
-  await prisma.user.upsert({
-    where: { email: 'user2@pocket48.local' },
-    update: {
-      passwordHash: demoUserPasswordHash,
-      displayName: 'Demo User 2',
-      role: Role.USER,
-      isActive: true,
-    },
-    create: {
-      email: 'user2@pocket48.local',
-      passwordHash: demoUserPasswordHash,
-      displayName: 'Demo User 2',
-      role: Role.USER,
-      isActive: true,
-    },
-  });
+    await prisma.user.upsert({
+      where: { email: 'user1@pocket48.local' },
+      update: {
+        passwordHash: demoUserPasswordHash,
+        displayName: 'Demo User 1',
+        role: Role.USER,
+        isActive: true,
+      },
+      create: {
+        email: 'user1@pocket48.local',
+        passwordHash: demoUserPasswordHash,
+        displayName: 'Demo User 1',
+        role: Role.USER,
+        isActive: true,
+      },
+    });
+
+    await prisma.user.upsert({
+      where: { email: 'user2@pocket48.local' },
+      update: {
+        passwordHash: demoUserPasswordHash,
+        displayName: 'Demo User 2',
+        role: Role.USER,
+        isActive: true,
+      },
+      create: {
+        email: 'user2@pocket48.local',
+        passwordHash: demoUserPasswordHash,
+        displayName: 'Demo User 2',
+        role: Role.USER,
+        isActive: true,
+      },
+    });
+  } else {
+    console.log('DEMO_USER_PASSWORD not provided; skipping demo user seed.');
+  }
 
   // 4. Seed Initial Categories
   const initialCategories: { name: string; type: TransactionType }[] = [
