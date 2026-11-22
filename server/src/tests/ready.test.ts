@@ -8,10 +8,12 @@ describe('Health & Readiness Probes', () => {
     vi.restoreAllMocks();
   });
 
-  it('GET /api/health returns 200 and liveness payload', async () => {
+  it('GET /api/health returns 200 and liveness payload with version and commit', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('ok');
+    expect(res.body.version).toBeDefined();
+    expect(res.body.commit).toBeDefined();
     expect(res.body.timestamp).toBeDefined();
   });
 

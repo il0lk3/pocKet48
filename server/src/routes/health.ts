@@ -3,10 +3,15 @@ import { prisma } from '../db';
 
 export const healthRouter = Router();
 
-// Liveness probe
+const APP_VERSION = process.env.APP_VERSION || '1.0.0';
+const APP_COMMIT_SHA = process.env.APP_COMMIT_SHA || 'dev';
+
+// Liveness probe (exposes deployed version and commit SHA for release verification)
 healthRouter.get('/health', (_req: Request, res: Response) => {
   res.status(200).json({
     status: 'ok',
+    version: APP_VERSION,
+    commit: APP_COMMIT_SHA,
     timestamp: new Date().toISOString(),
   });
 });

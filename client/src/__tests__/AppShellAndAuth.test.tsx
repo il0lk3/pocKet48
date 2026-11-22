@@ -101,6 +101,7 @@ describe('Issue #9: Client login, app shell, and role-aware navigation', () => {
       'Demo User 1'
     );
     expect(screen.getByTestId('user-role-badge')).toHaveTextContent('USER');
+    expect(screen.getByTestId('release-commit')).toHaveTextContent(/v1\.0\.0/);
     expect(
       screen.queryByRole('link', { name: /category catalogue/i })
     ).not.toBeInTheDocument();

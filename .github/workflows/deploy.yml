@@ -154,7 +154,7 @@ jobs:
         run: |
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
           IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/s90606c10/s90606c10:$IMAGE_TAG"
-          docker build --tag "$IMAGE" .
+          docker build --build-arg APP_COMMIT_SHA="$IMAGE_TAG" --tag "$IMAGE" .
           docker push "$IMAGE"
 
       # ------------------------------------------------------------------------
