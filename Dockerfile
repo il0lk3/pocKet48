@@ -47,7 +47,9 @@ COPY client/package*.json ./
 RUN npm ci
 COPY client/ ./
 # Empty API URL => the SPA calls the API on the same origin (same container).
+ARG APP_COMMIT_SHA=dev
 ENV VITE_API_URL=""
+ENV VITE_APP_COMMIT_SHA=${APP_COMMIT_SHA}
 RUN npm run build
 
 # ============================================================================
@@ -85,8 +87,10 @@ COPY --from=client-builder /app/client/dist /app/client/dist
 RUN chmod +x ./docker-entrypoint.sh
 
 # --- Runtime configuration ----------------------------------------------------
+ARG APP_COMMIT_SHA=dev
 ENV NODE_ENV=production
 ENV TZ=Asia/Bangkok
+ENV APP_COMMIT_SHA=${APP_COMMIT_SHA}
 # CHANGE ME: PORT must match your app AND `--port` in deploy/deploy.sh (step 11).
 ENV PORT=3000
 EXPOSE 3000

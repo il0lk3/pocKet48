@@ -143,7 +143,7 @@ fi
 #    Tag `latest` is only for this first manual setup; deploy.yml uses commit SHAs.
 # ==============================================================================
 run_cmd gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
-run_cmd docker build --platform linux/amd64 --tag "$IMAGE_URI" .
+run_cmd docker build --platform linux/amd64 --build-arg APP_COMMIT_SHA="$IMAGE_TAG" --tag "$IMAGE_URI" .
 run_cmd docker push "$IMAGE_URI"
 if [ "$DRY_RUN" != "1" ]; then
   IMAGE_URI="$(gcloud artifacts docker images describe "$IMAGE_URI" --project "$PROJECT_ID" --format='value(image_summary.fully_qualified_digest)')"
