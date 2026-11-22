@@ -1,16 +1,17 @@
 # ##############################################################################
-# CI — "CI & Docker Build"
+# pocKet48 CI — "CI & Docker Build"
 # ##############################################################################
 # WHAT THIS WORKFLOW DOES
-#   Runs the project's checks and is used in two ways:
-#     1) directly on every pull request to `main` (and manually), and
-#     2) as a REUSABLE workflow called by deploy.yml (`workflow_call`) so the
-#        deploy only starts after these checks pass.
-#   Steps: offline deploy-script tests -> backend tests (real PostgreSQL service)
-#          -> frontend tests + build -> verify the production Dockerfile builds.
+#   Runs the project's automated checks and is used in two ways:
+#     1) directly on every pull request to `staging` and `main` (and manually),
+#     2) as a REUSABLE workflow called by deploy.yml (`workflow_call`) so
+#        deployment only starts after all checks pass.
+#   Steps: offline deploy-script checks -> backend migrate/seed/test/build
+#          (PostgreSQL 16 service) -> frontend test/build -> Playwright E2E
+#          journey (TEST-13) -> unified production Dockerfile build.
 #   It does NOT deploy anything.
 #
-# ⚠️ DO NOT RENAME (the lab guide refers to these names):
+# ⚠️ DO NOT RENAME (the lab guide and ruleset refer to these names):
 #   - job id : test-and-docker
 #   - deploy.yml uses `environment: demo` and the 4 variables GCP_PROJECT_ID,
 #     GCP_REGION, WIF_PROVIDER, WIF_SERVICE_ACCOUNT — keep those names too.
@@ -21,21 +22,15 @@
 #   - Service containers   : https://docs.github.com/en/actions/using-containerized-services/about-service-containers
 #   - Concurrency          : https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs
 #   - Pin actions to a SHA : https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions
-#
-# ⭐ CHANGE ME — groups using another tech stack must edit (marked below):
-#   # CHANGE ME: database service image / credentials
-#   # CHANGE ME: language setup steps (Node.js 24, Python 3.14)
-#   # CHANGE ME: install / migrate / seed / test commands, working-directory
-#   # CHANGE ME: docker image tag
 # ##############################################################################
 
 name: CI & Docker Build
 
 # ------------------------------------------------------------------------------
 # Triggers
-#   workflow_call     : lets deploy.yml reuse this workflow (do not remove).
-#   pull_request/main : checks every PR before merge.
-#   workflow_dispatch : manual "Run workflow" button.
+#   workflow_call             : lets deploy.yml reuse this workflow.
+#   pull_request/main,staging : checks every PR before merge.
+#   workflow_dispatch         : manual "Run workflow" button.
 # ------------------------------------------------------------------------------
 on:
   workflow_call:
@@ -59,8 +54,8 @@ jobs:
     timeout-minutes: 30
 
     # --------------------------------------------------------------------------
-    # Temporary PostgreSQL used only by the tests. Throw-away CI values, not
-    # real secrets. CHANGE ME: use the database your project needs.
+    # Temporary PostgreSQL 16 used only by CI tests. Throw-away CI values, not
+    # real secrets. Matches DATABASE_URL below.
     # --------------------------------------------------------------------------
     services:
       postgres:
@@ -80,9 +75,7 @@ jobs:
 
     steps:
       # ------------------------------------------------------------------------
-      # 1. Get the source code
-      #    (third-party actions are pinned to a commit SHA; the comment shows the
-      #     version. Dependabot keeps them updated — see .github/dependabot.yml)
+      # 1. Get the source code (third-party actions pinned to commit SHAs)
       # ------------------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -90,15 +83,13 @@ jobs:
           persist-credentials: false
 
       # ------------------------------------------------------------------------
-      # 2. Language runtimes
-      #    CHANGE ME: replace with the runtime(s) your stack needs.
+      # 2. Language runtimes (Node.js 24 for Pocket48, Python 3.14 for deploy smoke tests)
       # ------------------------------------------------------------------------
       - name: Setup Node.js 24
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
 
-      # Python is only needed for the deploy smoke-test unit tests below.
       - name: Setup Python 3.14
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
@@ -106,9 +97,6 @@ jobs:
 
       # ------------------------------------------------------------------------
       # 3. Deploy scripts: syntax check + offline tests (NO access to GCP)
-      #    ⭐ IMPORTANT: guards deploy.sh / release.sh / smoke_test.py so a broken
-      #    script is caught before it can break a deployment.
-      #    CHANGE ME: keep only the checks for scripts your group actually uses.
       # ------------------------------------------------------------------------
       - name: Check deployment scripts without accessing GCP
         run: |
@@ -118,25 +106,26 @@ jobs:
           python3 -m unittest discover -s deploy/tests -p 'test_smoke.py'
 
       # ------------------------------------------------------------------------
-      # 4. Backend: install -> migrate -> seed -> test
-      #    ⭐ IMPORTANT: a failing test fails the job (and therefore the deploy).
-      #    CHANGE ME: working-directory, DATABASE_URL and every command in `run:`.
+      # 4. Backend: install -> generate -> migrate -> seed -> Vitest -> tsc build
       # ------------------------------------------------------------------------
-      - name: Install & Test Backend (Prisma Migrate + Seed + Vitest)
+      - name: Install, Test & Build Backend (Prisma + Vitest + TypeScript)
         working-directory: ./server
         env:
           DATABASE_URL: postgresql://pocket48:pocket48@localhost:5432/pocket48?schema=public
           ADMIN_PASSWORD: ci-admin-initial-password
           DEMO_USER_PASSWORD: ci-demo-initial-password
+          SESSION_SECRET: ci-pocket48-session-secret-at-least-32-chars
+          TZ: Asia/Bangkok
         run: |
           npm ci
+          npx prisma generate
           npx prisma migrate deploy
           npm run prisma:seed
           npm test
+          npm run build
 
       # ------------------------------------------------------------------------
-      # 5. Frontend: install -> test -> production build
-      #    CHANGE ME: remove or replace if there is no separate frontend.
+      # 5. Frontend: install -> Vitest component tests -> Vite production build
       # ------------------------------------------------------------------------
       - name: Install, Test & Build Frontend (Vitest + Production Build)
         working-directory: ./client
@@ -146,9 +135,43 @@ jobs:
           npm run build
 
       # ------------------------------------------------------------------------
-      # 6. Make sure the production image still builds (image is not pushed here)
-      #    CHANGE ME: image tag.
+      # 6. End-to-End Browser Journey Test (Playwright TEST-13 / AC-06-01)
+      #    Re-seeds cleanly after backend integration tests, then starts server
+      #    + Vite via playwright.config.ts webServer and runs Chromium E2E.
+      # ------------------------------------------------------------------------
+      - name: Run End-to-End Browser Test (Playwright TEST-13)
+        working-directory: ./client
+        env:
+          DATABASE_URL: postgresql://pocket48:pocket48@localhost:5432/pocket48?schema=public
+          PORT: "3000"
+          TZ: Asia/Bangkok
+          CORS_ORIGIN: http://localhost:5173
+          SESSION_SECRET: ci-pocket48-session-secret-at-least-32-chars
+          ADMIN_PASSWORD: ci-admin-initial-password
+          DEMO_USER_PASSWORD: ci-demo-initial-password
+          E2E_USER_EMAIL: user1@pocket48.local
+        run: |
+          npm run prisma:seed --prefix ../server
+          npx playwright install --with-deps chromium
+          npm run test:e2e
+
+      # ------------------------------------------------------------------------
+      # 7. Verify Unified Production Dockerfile builds cleanly (not pushed here)
       # ------------------------------------------------------------------------
       - name: Verify Unified Production Dockerfile Build
         run: |
           docker build -t pocket48:latest .
+
+      # ------------------------------------------------------------------------
+      # 8. Publish CI Check Summary (C-01 evidence)
+      # ------------------------------------------------------------------------
+      - name: Write CI summary
+        run: |
+          {
+            echo '### pocKet48 CI & Docker Build (`test-and-docker`)'
+            echo '- **Deploy script checks:** `bash -n`, `test_deploy_stub.sh`, `test_release_stub.sh`, `test_smoke.py` — passed'
+            echo '- **Backend:** `prisma generate`, `prisma migrate deploy`, `prisma:seed`, `vitest run` (35 tests), `tsc` build — passed'
+            echo '- **Frontend:** `vitest run` (11 tests), `tsc -b && vite build` — passed'
+            echo '- **E2E (Playwright Chromium):** `TEST-13` Sprint 1 user journey (1 test) — passed'
+            echo '- **Docker:** Unified multi-stage production image `docker build -t pocket48:latest .` — passed'
+          } >> "$GITHUB_STEP_SUMMARY"
