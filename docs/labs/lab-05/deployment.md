@@ -42,7 +42,7 @@ Every runtime setting is read from environment variables. **Zero real secrets, p
 | `APP_COMMIT_SHA` | No | No | `dev` (40-char SHA in CI/Docker) | `Dockerfile` `--build-arg` | Deployed Git commit SHA returned by `GET /api/health` |
 | `VITE_API_URL` | Build | No | `""` in Docker (`http://localhost:3000` dev) | `Dockerfile` / `client/.env.example` | Frontend API base URL (empty = same origin) |
 | `VITE_APP_COMMIT_SHA` | Build | No | `dev` (40-char SHA in Docker) | `Dockerfile` `--build-arg` | Short commit SHA rendered in `AppShell` footer |
-| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | Compose | `PASSWORD` is **Yes** | `pocket48` / `change-me-postgres-password` / `pocket48` | Root `.env` (from `.env.example`) | Local PostgreSQL container credentials for `docker-compose.yml` |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | Compose | `PASSWORD` is **Yes** | `pocket48` / `pocket48` / `pocket48` | Root `.env` (from `.env.example`) | Local PostgreSQL container credentials for `docker-compose.yml` |
 
 ---
 
