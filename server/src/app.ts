@@ -7,6 +7,7 @@ import { healthRouter } from './routes/health';
 import { authRouter } from './routes/auth';
 import { categoriesRouter } from './routes/categories';
 import { transactionsRouter } from './routes/transactions';
+import { adminUsersRouter } from './routes/adminUsers';
 import { authenticateSession } from './middleware/auth';
 
 // BigInt JSON serialization polyfill
@@ -38,6 +39,7 @@ app.use('/api', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/categories', categoriesRouter);
 app.use('/api/transactions', transactionsRouter);
+app.use('/api/admin/users', adminUsersRouter);
 
 // In production, serve built frontend static files if client/dist exists
 const clientDistPath = path.resolve(__dirname, '../../client/dist');

@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { TransactionsPage } from './pages/TransactionsPage';
 import { AdminCategoriesPage } from './pages/AdminCategoriesPage';
+import { AdminUsersPage } from './pages/AdminUsersPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 const RootRedirect: React.FC = () => {
@@ -60,6 +61,15 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute allowedRoles={['ADMINISTRATOR']}>
             <AdminCategoriesPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute allowedRoles={['ADMINISTRATOR']}>
+            <AdminUsersPage />
           </ProtectedRoute>
         }
       />

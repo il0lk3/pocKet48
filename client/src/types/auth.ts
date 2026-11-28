@@ -9,6 +9,11 @@ export interface User {
   role: Role;
 }
 
+export interface AdminUserAccount extends User {
+  isActive: boolean;
+  createdAt: string;
+}
+
 export interface Category {
   id: string;
   name: string;
