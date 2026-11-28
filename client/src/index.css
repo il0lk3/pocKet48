@@ -2330,3 +2330,71 @@ select.form-input,
     font-size: 0.78rem;
   }
 }
+
+
+/* ==========================================================================
+   Confirmation Modal & Account Administration Controls (Sprint 2)
+   ========================================================================== */
+.confirm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.confirm-modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border: 1.5px solid rgba(175, 140, 247, 0.25);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.confirm-modal-card p {
+  margin: 0.65rem 0 1.25rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  font-size: 0.94rem;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.65rem 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.btn-danger-outline {
+  border-color: rgba(225, 29, 72, 0.35);
+  color: #be123c;
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background: rgba(255, 228, 235, 0.65);
+}
+
+.self-indicator {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}

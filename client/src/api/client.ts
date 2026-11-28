@@ -1,4 +1,5 @@
 import type {
+  AdminUserAccount,
   ApiErrorPayload,
   Category,
   CreateCategoryInput,
@@ -165,6 +166,22 @@ export const transactionsApi = {
     return apiRequest<Transaction>('/api/transactions', {
       method: 'POST',
       body: JSON.stringify(input),
+    });
+  },
+};
+
+export const adminUsersApi = {
+  async list(): Promise<AdminUserAccount[]> {
+    const result = await apiRequest<AdminUserAccount[]>('/api/admin/users', {
+      method: 'GET',
+    });
+    return Array.isArray(result) ? result : [];
+  },
+
+  async updateStatus(id: string, isActive: boolean): Promise<AdminUserAccount> {
+    return apiRequest<AdminUserAccount>(`/api/admin/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive }),
     });
   },
 };

@@ -100,16 +100,28 @@ export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) 
                   </>
                 )}
                 {user.role === 'ADMINISTRATOR' && (
-                  <NavLink
-                    to="/admin/categories"
-                    onClick={() => setIsMobileNavOpen(false)}
-                    className={({ isActive }) =>
-                      `nav-link ${isActive ? 'active' : ''}`
-                    }
-                  >
-                    <TagIcon size={16} className="nav-icon" />
-                    <span>Category Catalogue</span>
-                  </NavLink>
+                  <>
+                    <NavLink
+                      to="/admin/categories"
+                      onClick={() => setIsMobileNavOpen(false)}
+                      className={({ isActive }) =>
+                        `nav-link ${isActive ? 'active' : ''}`
+                      }
+                    >
+                      <TagIcon size={16} className="nav-icon" />
+                      <span>Category Catalogue</span>
+                    </NavLink>
+                    <NavLink
+                      to="/admin/users"
+                      onClick={() => setIsMobileNavOpen(false)}
+                      className={({ isActive }) =>
+                        `nav-link ${isActive ? 'active' : ''}`
+                      }
+                    >
+                      <UserIcon size={16} className="nav-icon" />
+                      <span>User Accounts</span>
+                    </NavLink>
+                  </>
                 )}
               </nav>
 
