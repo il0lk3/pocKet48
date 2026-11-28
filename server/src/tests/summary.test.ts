@@ -3,6 +3,11 @@ import request from 'supertest';
 import bcrypt from 'bcryptjs';
 import { app } from '../app';
 import { prisma } from '../db';
+import {
+  computeMonthlySummary,
+  formatSatangToTHB,
+  validateMonthParam,
+} from '../utils/summaryCalculation';
 
 describe('F-09a: Monthly Summary API & Exact Satang Arithmetic (TDD)', () => {
   const userAEmail = 'summary_user_a@pocket48.local';
@@ -294,5 +299,45 @@ describe('F-09a: Monthly Summary API & Exact Satang Arithmetic (TDD)', () => {
       expect(res.status).toBe(400);
       expect(res.body.error.code).toBe('VALIDATION_ERROR');
     }
+  });
+});
+
+describe('Domain Unit Tests: summaryCalculation (BR-08, NFR-07, D-10)', () => {
+  it('TEST-36 (Unit / NFR-07): computeMonthlySummary and formatSatangToTHB sum 0.10 + 0.20 to exact 0.30 with zero floating-point drift', () => {
+    const result = computeMonthlySummary('2026-11', [
+      {
+        type: 'EXPENSE',
+        amountSatang: 10n,
+        categoryId: 'cat-food',
+        category: { id: 'cat-food', name: 'Food' },
+      },
+      {
+        type: 'EXPENSE',
+        amountSatang: 20n,
+        categoryId: 'cat-food',
+        category: { id: 'cat-food', name: 'Food' },
+      },
+    ]);
+
+    expect(result.totalExpenseSatang).toBe(30);
+    expect(result.totalExpense).toBe(0.3);
+    expect(formatSatangToTHB(BigInt(result.totalExpenseSatang))).toBe('0.30');
+    expect(formatSatangToTHB(BigInt(result.balanceSatang))).toBe('-0.30');
+  });
+
+  it('validateMonthParam resolves leap-year and non-leap-year month end boundaries accurately', () => {
+    expect(validateMonthParam('2024-02')).toEqual({
+      valid: true,
+      value: { month: '2024-02', startDate: '2024-02-01', endDate: '2024-02-29' },
+    });
+    expect(validateMonthParam('2026-02')).toEqual({
+      valid: true,
+      value: { month: '2026-02', startDate: '2026-02-01', endDate: '2026-02-28' },
+    });
+    expect(validateMonthParam('2026-11')).toEqual({
+      valid: true,
+      value: { month: '2026-11', startDate: '2026-11-01', endDate: '2026-11-30' },
+    });
+    expect(validateMonthParam('2026-13').valid).toBe(false);
   });
 });
