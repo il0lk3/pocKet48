@@ -119,7 +119,8 @@ export function validateTransactionDate(dateStr: unknown, now: Date = new Date()
  */
 export function validateCategoryMatch(
   txType: TransactionType,
-  category: { id: string; type: TransactionType; isActive: boolean } | null
+  category: { id: string; type: TransactionType; isActive: boolean } | null,
+  options: { allowInactive?: boolean } = {}
 ): ValidationResult {
   if (!category) {
     return {
@@ -128,7 +129,7 @@ export function validateCategoryMatch(
     };
   }
 
-  if (!category.isActive) {
+  if (!category.isActive && !options.allowInactive) {
     return {
       valid: false,
       error: 'Category is deactivated.',
